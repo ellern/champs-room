@@ -1,13 +1,17 @@
 ﻿@model ChampsRoom.Models.LeagueDetailsViewModel
 
-<div class="row text-center">
-    <h1>@Model.League.Name</h1>
-    <p class="lead">
-        @if (Request.IsAuthenticated)
-        {
-            <a class="btn btn-large btn-info" href="@Url.Action("Create", "Result", new { leagueUrl = Model.League.Url })">Register result</a>
-        }
-    </p>
+<div class="row">
+    <div class="col-xs-12 col-sm-8 col-md-9">
+        <h1>@Model.League.Name</h1>
+    </div>
+    <div class="col-xs-12 col-sm-4 col-md-3">
+        <p class="lead">
+            @if (Request.IsAuthenticated)
+            {
+                <a class="btn btn-large btn-info pull-right" href="@Url.Action("Create", "Result", new { leagueUrl = Model.League.Url })">Register result</a>
+            }
+        </p>
+    </div>
 </div>
 
 <div class="row">
