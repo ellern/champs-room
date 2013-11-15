@@ -197,6 +197,15 @@
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\Helpers.cs" />
     <Compile Include="Helpers\Stats.cs" />
+    <Compile Include="Migrations\201311151506104_InitialCreate.cs" />
+    <Compile Include="Migrations\201311151506104_InitialCreate.Designer.cs">
+      <DependentUpon>201311151506104_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311151706378_UserAddEmail.cs" />
+    <Compile Include="Migrations\201311151706378_UserAddEmail.Designer.cs">
+      <DependentUpon>201311151706378_UserAddEmail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Models.cs" />
@@ -320,6 +329,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201311151506104_InitialCreate.resx">
+      <DependentUpon>201311151506104_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311151706378_UserAddEmail.resx">
+      <DependentUpon>201311151706378_UserAddEmail.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

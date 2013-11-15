@@ -23,6 +23,7 @@ namespace ChampsRoom.Models
     {
         public League League { get; set; }
         public ICollection<RankingViewModel> Rankings { get; set; }
+        public ICollection<Match> LatestMatches { get; set; }
     }
 
     public class LeagueMatchesViewModel
