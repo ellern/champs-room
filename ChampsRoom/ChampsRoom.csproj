@@ -232,7 +232,6 @@
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
     <Content Include="fonts\FontAwesome.otf" />
-    <None Include="Properties\PublishProfiles\Web Deploy.pubxml" />
     <None Include="scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="scripts\application.js" />
     <Content Include="scripts\flot\excanvas.js" />
