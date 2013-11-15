@@ -78,9 +78,9 @@ namespace ChampsRoom.Controllers
             if (league == null)
                 return HttpNotFound();
 
-            var userid = User.Identity.GetUserId();
-
             #region Find Players and Teams
+
+            var userid = User.Identity.GetUserId();
 
             var homePlayers = db.Players.Include(i => i.Teams).Where(q => home.Contains(q.Id));
             var awayPlayers = db.Players.Include(i => i.Teams).Where(q => away.Contains(q.Id));
@@ -88,7 +88,7 @@ namespace ChampsRoom.Controllers
             var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userid);
 
             if (user == null)
-                return RedirectToAction("~/");
+                return HttpNotFound();
 
             var userPlayerFound = false;
 
@@ -101,7 +101,7 @@ namespace ChampsRoom.Controllers
                     userPlayerFound = player.Id == user.Player.Id;
 
             if (!userPlayerFound)
-                return RedirectToAction("~/");
+                return HttpNotFound();
 
             var allTeams = db.Teams.Include(i => i.Players);
             var homeTeam = allTeams.Where(p => !p.Players.Select(c => c.Id).Except(home).Union(home.Except(p.Players.Select(c => c.Id))).Any()).FirstOrDefault();
