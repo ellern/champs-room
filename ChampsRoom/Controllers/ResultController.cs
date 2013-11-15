@@ -194,6 +194,7 @@ namespace ChampsRoom.Controllers
             foreach (var player in homeTeam.Players)
             {
                 var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == player.Id);
+                var rating = latestRating == null ? 1000 : latestRating.Rate;
                 var ratingChange = Convert.ToInt32(elo.FinalResult1) - avgHome;
 
                 ratings.Add(new Rating()
@@ -207,7 +208,7 @@ namespace ChampsRoom.Controllers
                     Rank = 0,
                     RankingChange = 0,
                     RankedLast = false,
-                    Rate = latestRating.Rate + ratingChange,
+                    Rate = rating + ratingChange,
                     RatingChange = ratingChange
                 });
             }
@@ -215,7 +216,8 @@ namespace ChampsRoom.Controllers
             foreach (var player in awayTeam.Players)
             {
                 var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == player.Id);
-                var ratingChange = Convert.ToInt32(elo.FinalResult2) - avgAway;
+                var rating = latestRating == null ? 1000 : latestRating.Rate;
+                var ratingChange = Convert.ToInt32(elo.FinalResult2) - avgAway;        
 
                 ratings.Add(new Rating()
                 {
@@ -228,7 +230,7 @@ namespace ChampsRoom.Controllers
                     Rank = 0,
                     RankingChange = 0,
                     RankedLast = false,
-                    Rate = latestRating.Rate + ratingChange,
+                    Rate = rating + ratingChange,
                     RatingChange = ratingChange
                 });
             }
