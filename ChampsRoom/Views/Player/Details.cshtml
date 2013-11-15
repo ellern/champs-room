@@ -1,0 +1,28 @@
+﻿@model ChampsRoom.Models.Player
+
+<div class="row text-center">
+    <h1>@Model.Name</h1>
+    <p class="lead">
+        <ul class="list-inline">
+            <li>Ranked in:</li>
+            @foreach (var item in Model.Leagues)
+            {
+                <li><a href="@Url.Action("Details", "League", new { id = item.Url})" class="btn btn-default btn-xs">@item.Name</a></li>
+            }
+        </ul>
+    </p>
+</div>
+
+<div class="row text-center">
+    <h1>Teams</h1>
+    <p class="lead"></p>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-md-12 text-center">
+        @foreach (var item in Model.Teams.Where(q => q.Players.Count > 1))
+        {
+            <a href="@Url.Action("Details", "Team", new { teamUrl = item.Url })" class="btn btn-default">@item.Name</a>
+        }
+    </div>
+</div>

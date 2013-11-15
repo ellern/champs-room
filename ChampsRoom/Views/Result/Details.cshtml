@@ -1,0 +1,135 @@
+﻿@model ChampsRoom.Models.LeagueMatchesViewModel
+@{
+    var chartRanking = "";
+    var chartRating = "";
+    var counter = Model.Matches.Count;
+
+    foreach (var item in Model.Matches.Take(50))
+    {
+        chartRanking = String.Format(",[{0},{1}]", counter, item.GetRating(Model.Player).Rank) + chartRanking;
+        chartRating = String.Format(",[{0},{1}]", counter--, item.GetRating(Model.Player).Rate) + chartRating;
+    }    
+}
+
+<div class="row text-center">
+    <h1>@Model.Player.Name</h1>
+    <p class="lead">All matches played in @Html.ActionLink(Model.League.Name, "Details", "League", new { id = Model.League.Url }, null)</p>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div id="chart-ranking" style="width: 100%; height: 300px;"></div>
+    </div>
+    <div class="col-md-6">
+        <div id="chart-rating" style="width: 100%; height: 300px;"></div>
+    </div>
+</div>
+
+<div class="row hidden-xs">
+    <div class="col-md-6 text-center text-muted">
+        Rank
+    </div>
+    <div class="col-md-6 text-center text-muted">
+        Rating
+    </div>
+</div>
+
+<div class="row row-top-spacer">
+    <div class="col-xs-12 col-md-12">
+        <table class="table table-striped table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Opponents</th>
+                    <th>Score</th>
+                    <th>Rating</th>
+                    <th>Rank</th>
+                </tr>
+            </thead>
+            @foreach (var item in Model.Matches)
+            {
+                var rating = item.GetRating(Model.Player);
+                <tr>
+                    <td>@item.Created.ToShortDateString() @item.Created.ToShortTimeString()</td>
+                    <td>
+                        <ul class="list-inline">
+                            @foreach (var opponent in item.Opponent(Model.Player))
+                            {
+                                <li><a href="@Url.Action("Details", new { leagueUrl = Model.League.Url, playerUrl = opponent.Url })">@opponent.Name</a></li>
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <div class="tooltip" rel="tooltip" data-toggle="tooltip" data-html="true" title="@item.GetSetScoresTooltip().ToHtmlString()">Score</div>
+                        @if (item.Draw)
+                        {
+                            <span class="label label-default">@item.GetHomeSetScore()</span> <span class="label label-default">@item.GetAwaySetScore()</span>
+                        }
+                        else if (item.PlayerWon(Model.Player))
+                        {
+                            <span class="label label-success">@item.GetHomeSetScore()</span> <span class="label label-success">@item.GetAwaySetScore()</span>
+                        }
+                        else
+                        {
+                            <span class="label label-danger">@item.GetHomeSetScore()</span> <span class="label label-danger">@item.GetAwaySetScore()</span>
+                        }
+                    </td>
+                    <td>
+                        <span class="label @rating.RatingChange.ValueLabelClass()"><i class="fa @rating.RatingChange.ValueIconClass()"></i> @rating.Rate <span class="small">@rating.RatingChange.DisplayChange()</span></span>
+                    </td>
+                    <td>
+                        <span class="label @rating.RankingChange.ValueLabelClass()"><i class="fa @rating.RankingChange.ValueIconClass()"></i> @rating.Rank <span class="small">@rating.RankingChange.DisplayChange()</span></span>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+@section scripts {
+    <script language="javascript" type="text/javascript" src="~/Scripts/flot/jquery.flot.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('.tooltip').tooltip();
+
+            var chartRanking = [@chartRanking.Trim(',')];
+            var chartRating = [@chartRating.Trim(',')];
+
+            var options = {
+                series: {
+                    color: '#4bcd4b',
+                    lines: { fill: true },
+                    points: { show: false }
+                },
+                yaxis: {
+                    //transform: function (v) { return -v; },
+                    //inverseTransform: function (v) { return -v; }
+                },
+                grid: {
+                    borderColor: '#d8d8d8',
+                    backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
+                }
+            };
+
+            var options2 = {
+                series: {
+                    color: '#4bcd4b',
+                    lines: { fill: true },
+                    points: { show: false }
+                },
+                yaxis: {
+                    //transform: function (v) { return -v; },
+                    //inverseTransform: function (v) { return -v; }
+                },
+                grid: {
+                    borderColor: '#d8d8d8',
+                    backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
+                }
+            };
+
+
+            $.plot($("#chart-ranking"), [chartRanking], options2);
+            $.plot($("#chart-rating"), [chartRating], options);
+        });
+    </script>
+}

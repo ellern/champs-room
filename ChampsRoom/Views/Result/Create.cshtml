@@ -1,0 +1,163 @@
+﻿@model ChampsRoom.Models.MatchCreateViewModel
+
+<div class="row text-center">
+    <h1>@Model.League.Name</h1>
+    <p class="lead">Register result</p>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.Hidden("LeagueId", Model.League.Id)
+
+    <div class="row text-center">
+        <h3>Players</h3>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-6 col-md-4 col-md-offset-2">
+            <p class="text-center">Home:</p>
+            <div class="well well-sm" style="height: 150px; overflow-y: auto;">
+                @foreach (var item in Model.Players)
+                {
+                    <label class="checkbox"><input class="checkbox-home" id="checkbox-home-@item.Id" type="checkbox" name="home" value="@item.Id" data-name="@item.Name" /> @item.Name</label>
+                }
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <p class="text-center">Away:</p>
+            <div class="well well-sm" style="height: 150px; overflow-y: auto;">
+                @foreach (var item in Model.Players)
+                {
+                    <label class="checkbox"><input class="checkbox-away" id="checkbox-away-@item.Id" type="checkbox" name="away" value="@item.Id" data-name="@item.Name" /> @item.Name</label>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <h3>Result</h3>
+    </div>
+
+    for (int i = 1; i <= Model.League.Sets; i++)
+    {
+        <div class="row" style="margin-top: 5px;">
+            <div class="col-xs-6 col-md-2 col-md-offset-4">
+                <input type="number" max="@Model.League.MaxScore" min="@Model.League.MinScore" class="form-control input-lg text-center @(i <= Model.League.SetsNeededToWin ? " required number" : "" ) result result-home result-home-@i" data-ref="result-away-@i" placeholder="#@i" alt="Result set @i" name="homescore" />
+            </div>
+            <div class="col-xs-6 col-md-2">
+                <input type="number" max="@Model.League.MaxScore" min="@Model.League.MinScore" class="form-control input-lg text-center @(i <= Model.League.SetsNeededToWin ? " required number" : "" ) result result-away result-away-@i" data-ref="result-home-@i" placeholder="#@i" alt="Result set @i" name="awayscore" />
+            </div>
+        </div>
+    }
+
+    <div class="row" style="margin-top: 25px;">
+        <div class="col-xs-12 col-md-12 text-center">
+            <p class="text-center hidden-xs">
+                <button type="submit" class="btn btn-success btn-lg btn-submit">Save result</button>
+            </p>
+            <p class="text-center visible-xs">
+                <button type="submit" class="btn btn-success btn-lg btn-block btn-submit">Save result</button>
+            </p>
+            <p><a href="@Url.Action("Details", "League", new { id = Model.League.Url })">Cancel</a></p>
+        </div>
+    </div>
+
+    <div class="row text-center result-winner" style="margin-top: 30px;">
+        <p class="lead">
+            <span class="player-home"></span>
+            <span class="text-winloose"></span>
+            <span class="player-away"></span>
+        </p>
+    </div>
+}
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).on('change', '.checkbox-home', function (event) {
+            var checked = $(this).prop("checked");
+            $("#checkbox-away-" + $(this).val()).prop("disabled", checked).prop("checked", false).fadeToggle(!checked);
+            findWinner();
+        });
+
+        $(document).on('change', '.checkbox-away', function (event) {
+            var checked = $(this).prop("checked");
+            $("#checkbox-home-" + $(this).val()).prop("disabled", checked).prop("checked", false).fadeToggle(!checked);
+            findWinner();
+        });
+
+        function findWinner() {
+            var setsNeeded = @(Model.League.SetsNeededToWin);
+            var setsCount = 0;
+            var found = false;
+            var homewins = 0;
+            var awaywins = 0;
+            var draws = 0;
+            var homeCount = 0;
+            var homeTeam = "";
+            var awayCount = 0;
+            var awayTeam = "";
+
+            $(".checkbox-home:checked").each(function () {
+                var name = $(this).data("name");
+                homeTeam = homeTeam + name + ",";
+                homeCount++;
+            });
+            homeTeam = homeTeam.substring(0, homeTeam.length - 2)
+
+            $(".checkbox-away:checked").each(function () {
+                var name = $(this).data("name");
+                awayTeam = awayTeam + name + ", ";
+                awayCount++;
+            });
+            awayTeam = awayTeam.substring(0, awayTeam.length - 2)
+
+            $(".result-home").each(function (index) {
+                var self = $(this);
+
+                if (self.val() && $('.' + self.data('ref')).val()) {
+                    setsCount++;
+
+                    var homescore = Number(self.val());
+                    var awayscore = Number($('.' + self.data('ref')).val());
+
+                    if (homescore > awayscore)
+                        homewins++;
+                    else if (awayscore > homescore)
+                        awaywins++;
+                    else if (homescore == awayscore)
+                        draws++;
+                }
+            });
+
+            if (homewins >= setsNeeded || awaywins >= setsNeeded || draws >= setsNeeded)
+                found = true;
+
+            if (homeCount == 0 || awayCount == 0)
+                found = false;
+
+            if (found) {
+                var text = homewins == awaywins ? "draws" : homewins > awaywins ? "wins against" : "looses to";
+
+                //var textArray = ['{0} wins {1}', '{0} beats {1}', '{0} kicks {1} asses', '{0} takes a piss on {1}'];
+                //var randomNumber = Math.floor(Math.random()*textArray.length);
+
+                $('.player-home').html(homeTeam);
+                $('.player-away').html(awayTeam);
+                $('.text-winloose').html(text);
+
+                $('.result-winner').fadeIn();
+                $('.btn-submit').prop("disabled", false);
+            }
+            else {
+                $('.result-winner').fadeOut();
+                $('.btn-submit').prop("disabled", true);
+            }
+        }
+
+        $(document).on('propertychange keyup input paste', '.result', function (event) {
+            findWinner();
+        });
+
+        findWinner();
+    </script>
+}

@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Champ's Room</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @Styles.Render("~/content/css")
+</head>
+<body>
+    <div class="navbar navbar-default navbar-champsroom navbar-static-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @if (ViewContext.RouteData.Values["controller"].ToString().ToLowerInvariant() != "home")
+                {
+                    <a class="navbar-brand pull-left hidden-xs" href="/"><img src="~/content/images/champroom.png" alt="Champ's Room" /></a>
+                    <a class="navbar-brand pull-left visible-xs" href="/">Champ's Room</a>
+                }
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="@Url.Action("Index", "League")"><i class="fa fa-list"></i> Leagues</a></li>
+                    <li><a href="@Url.Action("Index", "Team")"><i class="fa fa-group"></i> Teams & players</a></li>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <li><a href="@Url.Action("Manage", "Account")"><i class="fa fa-user"></i> You</a></li>
+                    }
+                    else
+                    {
+                        <li><a href="@Url.Action("Login", "Account")"><i class="fa fa-lock"></i> Login</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        @RenderBody()
+    </div>
+
+    @Scripts.Render("~/scripts/js")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

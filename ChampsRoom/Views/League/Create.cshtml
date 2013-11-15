@@ -1,0 +1,75 @@
+﻿@model ChampsRoom.Models.League
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>League</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Sets)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Sets)
+            @Html.ValidationMessageFor(model => model.Sets)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.SetsNeededToWin)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.SetsNeededToWin)
+            @Html.ValidationMessageFor(model => model.SetsNeededToWin)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.MinScore)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.MinScore)
+            @Html.ValidationMessageFor(model => model.MinScore)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.MaxScore)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.MaxScore)
+            @Html.ValidationMessageFor(model => model.MaxScore)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Rules)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Rules)
+            @Html.ValidationMessageFor(model => model.Rules)
+        </div>
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

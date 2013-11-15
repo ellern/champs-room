@@ -1,0 +1,29 @@
+﻿@model ChampsRoom.Models.OverviewTeamPlayersViewModel
+
+<div class="row text-center">
+    <h1>Teams</h1>
+    <p class="lead"></p>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-md-12 text-center">
+        @foreach (var item in Model.Teams)
+        {
+            <a href="@Url.Action("Details", "Team", new { teamUrl = item.Url })" class="btn btn-default btn-lg">@item.Name</a>
+        }
+    </div>
+</div>
+
+<div class="row text-center">
+    <h1>Players</h1>
+    <p class="lead"></p>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-md-12 text-center">
+        @foreach (var item in Model.Players)
+        {
+            <a href="@Url.Action("Details", "Player", new { playerUrl = item.Url })" class="btn btn-default btn-lg">@item.Name</a>
+        }
+    </div>
+</div>

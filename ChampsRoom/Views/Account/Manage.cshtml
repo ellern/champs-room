@@ -1,0 +1,52 @@
+﻿@using ChampsRoom.Models;
+@using Microsoft.AspNet.Identity;
+
+<div class="row row-top-spacer">
+    <div class="col-lg-5">
+        <div class="media">
+            <a class="pull-left" href="#">
+                <img class="media-object dp img-circle" src="http://placehold.it/500x500&text=Profile+image" style="width: 100px;height:100px;">
+            </a>
+            <div class="media-body">
+                <h4 class="media-heading">@User.Identity.GetUserName()</h4>
+
+                <h5>
+                    @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "form-inline" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+                    }
+                </h5>
+
+                @if (ViewBag.Leagues != null)
+                {
+                    <hr style="margin:8px auto">
+                    foreach (var item in ViewBag.Leagues)
+                    {
+                        <span class="label label-default">@item.Name</span>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+
+<div class="row">
+    <div class="col-md-12">
+        @if (ViewBag.HasLocalPassword)
+        {
+            @Html.Partial("_ChangePasswordPartial")
+        }
+        else
+        {
+            @Html.Partial("_SetPasswordPartial")
+        }
+
+        <section id="externalLogins">
+            @Html.Action("RemoveAccountList")
+            @Html.Partial("_ExternalLoginsListPartial", new { Action = "LinkLogin", ReturnUrl = ViewBag.ReturnUrl })
+        </section>
+    </div>
+</div>
