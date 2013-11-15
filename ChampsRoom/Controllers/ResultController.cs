@@ -84,8 +84,26 @@ namespace ChampsRoom.Controllers
 
             var homePlayers = db.Players.Include(i => i.Teams).Where(q => home.Contains(q.Id));
             var awayPlayers = db.Players.Include(i => i.Teams).Where(q => away.Contains(q.Id));
-            var allTeams = db.Teams.Include(i => i.Players);
 
+            var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userid);
+
+            if (user == null)
+                return RedirectToAction("~/");
+
+            var userPlayerFound = false;
+
+            foreach (var player in homePlayers)
+                if (!userPlayerFound)
+                    userPlayerFound = player.Id == user.Player.Id;
+
+            foreach (var player in awayPlayers)
+                if (!userPlayerFound)
+                    userPlayerFound = player.Id == user.Player.Id;
+
+            if (!userPlayerFound)
+                return RedirectToAction("~/");
+
+            var allTeams = db.Teams.Include(i => i.Players);
             var homeTeam = allTeams.Where(p => !p.Players.Select(c => c.Id).Except(home).Union(home.Except(p.Players.Select(c => c.Id))).Any()).FirstOrDefault();
             var awayTeam = allTeams.Where(p => !p.Players.Select(c => c.Id).Except(away).Union(away.Except(p.Players.Select(c => c.Id))).Any()).FirstOrDefault();
 
@@ -174,6 +192,10 @@ namespace ChampsRoom.Controllers
             var ratings = new List<Rating>();
 
             foreach (var player in homeTeam.Players)
+            {
+                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == player.Id);
+                var ratingChange = Convert.ToInt32(elo.FinalResult1) - avgHome;
+
                 ratings.Add(new Rating()
                 {
                     Draw = draw,
@@ -185,11 +207,16 @@ namespace ChampsRoom.Controllers
                     Rank = 0,
                     RankingChange = 0,
                     RankedLast = false,
-                    Rate = Convert.ToInt32(elo.FinalResult1),
-                    RatingChange = Convert.ToInt32(elo.FinalResult1) - avgHome
+                    Rate = latestRating.Rate + ratingChange,
+                    RatingChange = ratingChange
                 });
+            }
 
             foreach (var player in awayTeam.Players)
+            {
+                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == player.Id);
+                var ratingChange = Convert.ToInt32(elo.FinalResult2) - avgAway;
+
                 ratings.Add(new Rating()
                 {
                     Draw = draw,
@@ -201,9 +228,10 @@ namespace ChampsRoom.Controllers
                     Rank = 0,
                     RankingChange = 0,
                     RankedLast = false,
-                    Rate = Convert.ToInt32(elo.FinalResult2),
-                    RatingChange = Convert.ToInt32(elo.FinalResult2) - avgAway
+                    Rate = latestRating.Rate + ratingChange,
+                    RatingChange = ratingChange
                 });
+            }
 
             #endregion
 
