@@ -3,7 +3,10 @@
 <div class="row text-center">
     <h1>@Model.League.Name</h1>
     <p class="lead">
-        <a class="btn btn-large btn-info" href="@Url.Action("Create", "Result", new { leagueUrl = Model.League.Url })">Register result</a>
+        @if (Request.IsAuthenticated)
+        {
+            <a class="btn btn-large btn-info" href="@Url.Action("Create", "Result", new { leagueUrl = Model.League.Url })">Register result</a>
+        }
     </p>
 </div>
 
@@ -35,7 +38,7 @@
                 <tr>
                     <td>
                         @if (item.RankingChange == 0)
-                        { 
+                        {
                             @item.Rank
                         }
                         else if (item.RankingChange != 0)
@@ -53,7 +56,7 @@
                         else if (item.Rank == Model.Rankings.Count)
                         {
                             <img src="~/content/images/rank-last.gif" style="height: 16px; top: -1px; left: 3px; position: relative;" alt="" />
-                        }                       
+                        }
                     </td>
                     <td>@Html.ActionLink(item.Player.Name ?? "Unknown", "Details", "Result", new { leagueUrl = Model.League.Url, playerUrl = item.Player.Url }, null)</td>
                     <td>

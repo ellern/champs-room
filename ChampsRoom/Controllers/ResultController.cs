@@ -7,6 +7,7 @@ using System.Data.Entity;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 
 namespace ChampsRoom.Controllers
 {
@@ -44,6 +45,7 @@ namespace ChampsRoom.Controllers
             return View(viewmodel);
         }
 
+        [Authorize]
         [Route("~/leagues/{leagueUrl}/result")]
         public async Task<ActionResult> Create(string leagueUrl)
         {
@@ -63,6 +65,7 @@ namespace ChampsRoom.Controllers
             return View(viewmodel);
         }
 
+        [Authorize]
         [HttpPost]
         [Route("~/leagues/{leagueUrl}/result")]
         public async Task<ActionResult> Create(Guid leagueId, List<Guid> home, List<Guid> away, List<int?> homeScore, List<int?> awayScore)
@@ -74,6 +77,8 @@ namespace ChampsRoom.Controllers
 
             if (league == null)
                 return HttpNotFound();
+
+            var userid = User.Identity.GetUserId();
 
             #region Find Players and Teams
 
