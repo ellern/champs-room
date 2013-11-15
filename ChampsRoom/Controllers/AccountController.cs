@@ -381,7 +381,8 @@ namespace ChampsRoom.Controllers
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             var identity = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
 
-            identity.AddClaim(new Claim("ImageUrl", user.ImageUrl));
+            if (!String.IsNullOrWhiteSpace(user.ImageUrl))
+                identity.AddClaim(new Claim("ImageUrl", user.ImageUrl));
             //identity.AddClaim(new Claim("Player", JsonConvert.SerializeObject(user.Player)));
 
             AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
