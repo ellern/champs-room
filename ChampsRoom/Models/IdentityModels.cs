@@ -10,7 +10,7 @@ namespace ChampsRoom.Models
     public class User : IdentityUser
     {
         public Player Player { get; set; }
-        public string Email { get; set; }
+        public string ImageUrl { get; set; }
     }
 
     public class DataContext : IdentityDbContext<User>

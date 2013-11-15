@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using ChampsRoom.Helpers;
 using ChampsRoom.Models;
+using Newtonsoft.Json;
 
 namespace ChampsRoom.Controllers
 {
@@ -209,6 +210,9 @@ namespace ChampsRoom.Controllers
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
+
+
+
         //
         // GET: /Account/ExternalLoginCallback
         [AllowAnonymous]
@@ -224,15 +228,34 @@ namespace ChampsRoom.Controllers
             var user = await UserManager.FindAsync(loginInfo.Login);
             if (user != null)
             {
+                await OnExternalLoginAuth(user);
                 await SignInAsync(user, isPersistent: false);
                 return RedirectToLocal(returnUrl);
             }
             else
             {
-                // If the user does not have an account, then prompt the user to create an account
+                if (!String.IsNullOrWhiteSpace(loginInfo.DefaultUserName))
+                {
+                    user = new User() { UserName = loginInfo.DefaultUserName };
+                    var result = await UserManager.CreateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        result = await UserManager.AddLoginAsync(user.Id, loginInfo.Login);
+                        if (result.Succeeded)
+                        {
+                            await OnExternalLoginAuth(user);
+                            await SignInAsync(user, isPersistent: false);
+                            await AttachPlayerAsync(user.Id);
+
+                            return RedirectToLocal(returnUrl);
+                        }
+                    }
+                }
+
+                // If the user does not have an account, then prompt the user to create an account - and if the automatically create failed
                 ViewBag.ReturnUrl = returnUrl;
                 ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-               
+
                 return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
             }
         }
@@ -284,15 +307,15 @@ namespace ChampsRoom.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new User() { UserName = model.UserName, Email = info.DefaultUserName };
+                var user = new User() { UserName = model.UserName };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded)
                     {
+                        await OnExternalLoginAuth(user);
                         await SignInAsync(user, isPersistent: false);
-
                         await AttachPlayerAsync(user.Id);
 
                         return RedirectToLocal(returnUrl);
@@ -357,6 +380,10 @@ namespace ChampsRoom.Controllers
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             var identity = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+
+            identity.AddClaim(new Claim("ImageUrl", user.ImageUrl));
+            //identity.AddClaim(new Claim("Player", JsonConvert.SerializeObject(user.Player)));
+
             AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
         }
 
@@ -400,7 +427,8 @@ namespace ChampsRoom.Controllers
 
         private class ChallengeResult : HttpUnauthorizedResult
         {
-            public ChallengeResult(string provider, string redirectUri) : this(provider, redirectUri, null)
+            public ChallengeResult(string provider, string redirectUri)
+                : this(provider, redirectUri, null)
             {
             }
 
@@ -442,6 +470,49 @@ namespace ChampsRoom.Controllers
 
             await db.SaveChangesAsync();
         }
-         
+
+        private async Task SetTwitterProfileImage(string userId, IEnumerable<Claim> claims)
+        {
+            // Retrieve the twitter access token and claim
+            var accessTokenClaim = claims.FirstOrDefault(x => x.Type == "urn:twitter:accesstoken");
+            var accessTokenSecretClaim = claims.FirstOrDefault(x => x.Type == "urn:twitter:accesstokensecret");
+
+            if (accessTokenClaim != null && accessTokenSecretClaim != null)
+            {
+                var service = new TweetSharp.TwitterService("ztVUp8CwG0jyYZZoDKGXg", "jyFWNjzApKtogHMnRVvdvBqWJF2gPHNldjvopHZSoE", accessTokenClaim.Value, accessTokenSecretClaim.Value);
+                var profile = service.GetUserProfile(new TweetSharp.GetUserProfileOptions());
+
+                if (profile != null && !String.IsNullOrWhiteSpace(profile.ProfileImageUrl))
+                {
+                    var user = db.Users.Find(userId);
+
+                    user.ImageUrl = profile.ProfileImageUrl.Replace("_normal", "_bigger");
+
+                    db.Entry(user).State = System.Data.Entity.EntityState.Modified;
+
+                    await db.SaveChangesAsync();
+                }
+            }
+        }
+
+        private async Task OnExternalLoginAuth(User user)
+        {
+            var externalIdentity = await HttpContext.GetOwinContext().Authentication.GetExternalIdentityAsync(DefaultAuthenticationTypes.ExternalCookie);
+
+            if (externalIdentity != null)
+            {
+                foreach (var item in externalIdentity.Claims)
+                {
+                    if (item.Type == ClaimTypes.NameIdentifier)
+                        continue;
+
+                    await UserManager.RemoveClaimAsync(user.Id, item);
+                    await UserManager.AddClaimAsync(user.Id, item);
+                }
+
+                await SetTwitterProfileImage(user.Id, externalIdentity.Claims);
+            }
+
+        }
     }
 }

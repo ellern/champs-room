@@ -1,22 +1,21 @@
 ﻿@using ChampsRoom.Models;
 @using Microsoft.AspNet.Identity;
 
-<div class="row row-top-spacer">
-    <div class="col-lg-5">
+<div class="row">
+    <div class="col-xs-12 col-md-12">
         <div class="media">
             <a class="pull-left" href="#">
-                <img class="media-object dp img-circle" src="http://placehold.it/500x500&text=Profile+image" style="width: 100px;height:100px;">
+                <img class="media-object img-circle img-profile img-profile-large" src="@User.Identity.GetImageUrl()" alt="">
             </a>
             <div class="media-body">
                 <h4 class="media-heading">@User.Identity.GetUserName()</h4>
-
-                <h5>
+                <p>
                     @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "form-inline" }))
                     {
                         @Html.AntiForgeryToken()
                         <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
                     }
-                </h5>
+                </p>
 
                 @if (ViewBag.Leagues != null)
                 {

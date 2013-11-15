@@ -53,6 +53,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.0.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Hammock.ClientProfile">
+      <HintPath>..\packages\TweetSharp.2.3.1\lib\4.0\Hammock.ClientProfile.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -91,7 +94,8 @@
       <HintPath>..\packages\Microsoft.Owin.Security.Twitter.2.0.1\lib\net45\Microsoft.Owin.Security.Twitter.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\TweetSharp.2.3.1\lib\4.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -146,6 +150,9 @@
     <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="TweetSharp">
+      <HintPath>..\packages\TweetSharp.2.3.1\lib\4.0\TweetSharp.dll</HintPath>
     </Reference>
     <Reference Include="WebGrease">
       <Private>True</Private>
@@ -204,6 +211,14 @@
     <Compile Include="Migrations\201311151706378_UserAddEmail.cs" />
     <Compile Include="Migrations\201311151706378_UserAddEmail.Designer.cs">
       <DependentUpon>201311151706378_UserAddEmail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311152212466_UserDeleteEmailAgain.cs" />
+    <Compile Include="Migrations\201311152212466_UserDeleteEmailAgain.Designer.cs">
+      <DependentUpon>201311152212466_UserDeleteEmailAgain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311152300072_UserAddImageUrl.cs" />
+    <Compile Include="Migrations\201311152300072_UserAddImageUrl.Designer.cs">
+      <DependentUpon>201311152300072_UserAddImageUrl.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -336,6 +351,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201311151706378_UserAddEmail.resx">
       <DependentUpon>201311151706378_UserAddEmail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311152212466_UserDeleteEmailAgain.resx">
+      <DependentUpon>201311152212466_UserDeleteEmailAgain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311152300072_UserAddImageUrl.resx">
+      <DependentUpon>201311152300072_UserAddImageUrl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

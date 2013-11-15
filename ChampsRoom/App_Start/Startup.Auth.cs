@@ -2,6 +2,7 @@
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
+using System.Collections.Generic;
 
 namespace ChampsRoom
 {
@@ -24,9 +25,21 @@ namespace ChampsRoom
             //    clientId: "",
             //    clientSecret: "");
 
-            //app.UseTwitterAuthentication(
-            //   consumerKey: "",
-            //   consumerSecret: "");
+            app.UseTwitterAuthentication(
+                new Microsoft.Owin.Security.Twitter.TwitterAuthenticationOptions()
+                {
+                    ConsumerKey = "ztVUp8CwG0jyYZZoDKGXg",
+                    ConsumerSecret = "jyFWNjzApKtogHMnRVvdvBqWJF2gPHNldjvopHZSoE",
+                    Provider = new Microsoft.Owin.Security.Twitter.TwitterAuthenticationProvider()
+                    {
+                        OnAuthenticated = async context =>
+                        {
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:accesstoken", context.AccessToken));
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:accesstokensecret", context.AccessTokenSecret));
+                        }
+                    }
+                }
+                );
 
             //app.UseFacebookAuthentication(
             //   appId: "",

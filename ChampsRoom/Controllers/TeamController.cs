@@ -55,7 +55,7 @@ namespace ChampsRoom.Controllers
         {
             var team = await db.Teams.Include(q => q.Players).Include(q => q.Leagues).Include(q => q.Players).FirstOrDefaultAsync(q => q.Url.Equals(teamUrl, StringComparison.InvariantCultureIgnoreCase));
 
-            if (team == null || !CanEditTeam(team))
+            if (team == null || !Helpers.TeamHelper.CanEditTeam(team))
                 return HttpNotFound();
 
             return View(team);
@@ -69,7 +69,7 @@ namespace ChampsRoom.Controllers
         {
             var team = await db.Teams.Include(i => i.Players).FirstOrDefaultAsync(q => q.Id == model.Id);
 
-            if (team == null || !CanEditTeam(team))
+            if (team == null || !Helpers.TeamHelper.CanEditTeam(team))
                 return HttpNotFound();
 
             if (!team.Name.Trim().Equals(model.Name.Trim(), StringComparison.InvariantCultureIgnoreCase))
@@ -109,19 +109,7 @@ namespace ChampsRoom.Controllers
             return Guid.Empty;
         }
 
-        private bool CanEditTeam(Team team)
-        {
-            if (team == null || !Request.IsAuthenticated)
-                return false;
 
-            var userId = User.Identity.GetUserId();
-            var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userId);
-
-            if (team.Players.FirstOrDefault(q => q.Id == user.Player.Id) == null)
-                return false;
-
-            return true;
-        }
 
         protected override void Dispose(bool disposing)
         {

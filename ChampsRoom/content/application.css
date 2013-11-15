@@ -6,14 +6,19 @@
     margin-top: 25px;
 }
 
-.dp {
+.img-profile {
     border: 5px solid #eee;
     transition: all 0.2s ease-in-out;
 }
 
-    .dp:hover {
+    .img-profile:hover {
         border: 1px solid #eee;
+
     }
+
+.img-profile-large {
+    width: 80px;
+}
 
 .table-clickable > tbody > tr:hover {
     cursor: pointer;

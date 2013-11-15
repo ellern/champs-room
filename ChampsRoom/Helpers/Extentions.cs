@@ -1,11 +1,37 @@
-﻿using System;
+﻿using ChampsRoom.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Security.Claims;
+using System.Security.Principal;
+using Microsoft.AspNet.Identity;
+using Newtonsoft.Json;
 
 namespace ChampsRoom.Helpers
 {
+    public static class IdentityExtentions
+    {
+        public static string GetImageUrl(this IIdentity identity)
+        {
+            if (identity == null)
+                throw new ArgumentNullException("identity");
+
+            ClaimsIdentity claimsIdentity = identity as ClaimsIdentity;
+
+            if (claimsIdentity != null)
+            {
+                var imageUrl = claimsIdentity.FindFirstValue("ImageUrl");
+
+                if (!String.IsNullOrWhiteSpace(imageUrl))
+                    return imageUrl;
+            }
+
+            return "http://placehold.it/400x400&text=No+image";
+        }
+    }
+
     public static class Extentions
     {
         public static string DisplayChange(this int value)
@@ -49,7 +75,7 @@ namespace ChampsRoom.Helpers
             return String.Empty;
         }
 
-        
+
 
         public static string ToFriendlyUrl(this string s)
         {

@@ -3,11 +3,16 @@
 <div class="row text-center">
     <h1>@Model.Name</h1>
     <p class="lead">
+        @if (ChampsRoom.Helpers.TeamHelper.CanEditTeam(Model))
+        {
+            <a href="@Url.Action("Edit", new { teamUrl = Model.Url })" class="btn btn-default btn-sm">Edit team</a>
+        }
+
         <ul class="list-inline">
             <li>Ranked in:</li>
             @foreach (var item in Model.Leagues)
             {
-                <li><a href="@Url.Action("Details", "League", new { id = item.Url})" class="btn btn-default btn-xs">@item.Name</a></li>
+                <li><a href="@Url.Action("Details", "League", new { id = item.Url})" class="btn btn-default btn-info">@item.Name</a></li>
             }
         </ul>
     </p>
@@ -22,7 +27,7 @@
     <div class="col-xs-12 col-md-12 text-center">
         @foreach (var item in Model.Players)
         {
-            <a href="@Url.Action("Details", "Player", new { playerUrl = item.Url })" class="btn btn-default">@item.Name</a>
+            <a href="@Url.Action("Details", "Player", new { playerUrl = item.Url })" class="btn btn-default btn-info">@item.Name</a>
         }
     </div>
 </div>
