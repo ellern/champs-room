@@ -1,5 +1,7 @@
 ﻿
 $(document).ready(function () {
+    console.log("document ready");
+
     $("[rel='tooltip']").tooltip({ html: true });
 });
 
