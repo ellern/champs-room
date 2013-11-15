@@ -71,3 +71,30 @@
         </table>
     </div>
 </div>
+
+<div class="row text-center">
+    <h1>Latest matches</h1>
+    <p class="lead">
+    </p>
+</div> 
+
+<div class="row">
+    <div class="col-xs-12 col-md-12" >
+
+        @foreach (var item in Model.LatestMatches)
+        {
+            <div class="row text-center">
+                <div class="col-xs-12 col-md-12">
+                    <h4>
+                        <a href="@Url.Action("Details", "Team", new { teamUrl = item.HomeTeam.Url })">@item.HomeTeam.Name</a>
+                        <span class="label label-default">@item.GetHomeSetScore()</span>
+                        <small>vs.</small>
+                        <span class="label label-default">@item.GetAwaySetScore()</span>
+                        <a href="@Url.Action("Details", "Team", new { teamUrl = item.AwayTeam.Url })">@item.AwayTeam.Name</a>
+                    </h4>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

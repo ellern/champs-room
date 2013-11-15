@@ -28,33 +28,40 @@ namespace ChampsRoom.Controllers
         [Route("{id}")]
         public async Task<ActionResult> Details(string id)
         {
+            var league = await db.Leagues.FirstOrDefaultAsync(q => q.Url.Equals(id, StringComparison.InvariantCultureIgnoreCase));
+
+            if (league == null)
+                return HttpNotFound();
+
             var ratings = await db.Ratings
                 .Include(i => i.Player)
                 .Include(i => i.Team)
                 .Include(i => i.League)
                 .OrderByDescending(q => q.Created)
-                .Where(q => q.League.Url.Equals(id, StringComparison.InvariantCultureIgnoreCase)).ToListAsync();
+                .Where(q => q.LeagueId == league.Id).ToListAsync();
 
-            var league = await db.Leagues
-                .Include(i => i.Players)
-                .FirstOrDefaultAsync(q => q.Url.Equals(id, StringComparison.InvariantCultureIgnoreCase));
-
-            if (league == null)
-                return HttpNotFound();
+            var latestMatches = await db.Matches
+                .Take(20)
+                .Include(i => i.Sets)
+                .Include(i => i.AwayPlayers)
+                .Include(i => i.HomePlayers)
+                .Include(i => i.AwayTeam)
+                .Include(i => i.HomeTeam)
+                .OrderByDescending(q => q.Created).ToListAsync();
 
             var rankings = new List<RankingViewModel>();
 
-            foreach (var player in league.Players.Distinct())
+            foreach (var player in ratings.Select(q => q.Player).Distinct())
             {
-                var userRatings = ratings.Where(q => q.PlayerId == player.Id);
-                var latestRating = userRatings.FirstOrDefault();
+                var playerRatings = ratings.Where(q => q.PlayerId == player.Id);
+                var latestRating = playerRatings.FirstOrDefault();
 
                 var ranking = new RankingViewModel()
                 {
-                    Draw = userRatings.Count(q => q.Draw == true),
-                    Lost = userRatings.Count(q => q.Lost == true),
-                    Won = userRatings.Count(q => q.Won == true),
-                    Played = userRatings.Count(),
+                    Draw = playerRatings.Count(q => q.Draw == true),
+                    Lost = playerRatings.Count(q => q.Lost == true),
+                    Won = playerRatings.Count(q => q.Won == true),
+                    Played = playerRatings.Count(),
                     Player = player,
                     Rank = latestRating == null ? 0 : latestRating.Rank,
                     RankingChange = latestRating == null ? 0 : latestRating.RankingChange,
@@ -66,21 +73,23 @@ namespace ChampsRoom.Controllers
                 rankings.Add(ranking);
             }
 
-            var rank = 1;
-
             var viewmodel = new LeagueDetailsViewModel()
             {
+                LatestMatches = latestMatches,
                 League = league,
                 Rankings = rankings
                     .OrderByDescending(q => q.Rating)
                     .ThenByDescending(q => q.Won)
+                    .ThenByDescending(q => q.Draw)
                     .ThenBy(q => q.Played)
                     .ThenBy(q => q.Player.Name)
                     .ToList()
             };
 
+            var rank = 0;
+
             foreach (var item in viewmodel.Rankings)
-                item.Rank = rank++;
+                item.Rank = ++rank;
 
             return View(viewmodel);
         }
