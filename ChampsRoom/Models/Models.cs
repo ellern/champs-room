@@ -210,6 +210,7 @@ namespace ChampsRoom.Models
         public int RatingChange { get; set; }
         public int Rank { get; set; }
         public int RankingChange { get; set; }
+        public int Score { get; set; }
         public bool RankedLast { get; set; }
         public Guid LeagueId { get; set; }
         public League League { get; set; }

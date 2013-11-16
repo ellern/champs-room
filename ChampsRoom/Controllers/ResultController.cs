@@ -209,7 +209,8 @@ namespace ChampsRoom.Controllers
                     RankingChange = 0,
                     RankedLast = false,
                     Rate = rating + ratingChange,
-                    RatingChange = ratingChange
+                    RatingChange = ratingChange,
+                    Score = sets.Sum(q => q.HomeScore) - sets.Sum(q => q.AwayScore)
                 });
             }
 
@@ -231,7 +232,8 @@ namespace ChampsRoom.Controllers
                     RankingChange = 0,
                     RankedLast = false,
                     Rate = rating + ratingChange,
-                    RatingChange = ratingChange
+                    RatingChange = ratingChange,
+                    Score = sets.Sum(q => q.AwayScore) - sets.Sum(q => q.HomeScore)
                 });
             }
 

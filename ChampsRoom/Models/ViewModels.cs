@@ -15,6 +15,7 @@ namespace ChampsRoom.Models
         public int Won { get; set; }
         public int Draw { get; set; }
         public int Lost { get; set; }
+        public int Score { get; set; }
         public int Rating { get; set; }
         public int RatingChange { get; set; }    
     }

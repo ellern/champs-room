@@ -67,6 +67,7 @@ namespace ChampsRoom.Controllers
                     RankingChange = latestRating == null ? 0 : latestRating.RankingChange,
                     Rating = latestRating == null ? 1000 : latestRating.Rate,
                     RatingChange = latestRating == null ? 0 : latestRating.RatingChange,
+                    Score = latestRating == null ? 0 : latestRating.Score,
                     Team = null
                 };
 

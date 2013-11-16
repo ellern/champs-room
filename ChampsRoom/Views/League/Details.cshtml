@@ -21,19 +21,19 @@
                 <tr>
                     <th>Rank</th>
                     <th>Player</th>
-                    <th>Rating</th>
-                    <th class="hidden-xs">Played</th>
-                    <th>
+                    <th class="text-center">Rating</th>
+                    <th class="text-center hidden-xs">Played</th>
+                    <th class="text-center">
                         <span class="hidden-xs">Won</span>
                         <span class="visible-xs">W</span>
                     </th>
-                    <th>
-                        <span class="hidden-xs">Draw</span>
-                        <span class="visible-xs">D</span>
-                    </th>
-                    <th>
+                    <th class="text-center">
                         <span class="hidden-xs">Lost</span>
                         <span class="visible-xs">L</span>
+                    </th>
+                    <th class="text-center">
+                        <span class="hidden-xs">Score</span>
+                        <span class="visible-xs">S</span>
                     </th>
                 </tr>
             </thead>
@@ -63,13 +63,13 @@
                         }
                     </td>
                     <td>@Html.ActionLink(item.Player.Name ?? "Unknown", "Details", "Result", new { leagueUrl = Model.League.Url, playerUrl = item.Player.Url }, null)</td>
-                    <td>
+                    <td class="text-center">
                         @item.Rating <small class="text-muted">@item.RatingChange.DisplayChange()</small>
                     </td>
-                    <td class="hidden-xs">@item.Played</td>
-                    <td>@item.Won</td>
-                    <td>@item.Draw</td>
-                    <td>@item.Lost</td>
+                    <td class="text-center hidden-xs">@item.Played</td>
+                    <td class="text-center">@item.Won</td>
+                    <td class="text-center">@item.Lost</td>
+                    <td class="text-center">@item.Score.DisplayChange()</td>
                 </tr>
             }
         </table>

@@ -220,6 +220,10 @@
     <Compile Include="Migrations\201311152300072_UserAddImageUrl.Designer.cs">
       <DependentUpon>201311152300072_UserAddImageUrl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201311160015302_RatingAddScore.cs" />
+    <Compile Include="Migrations\201311160015302_RatingAddScore.Designer.cs">
+      <DependentUpon>201311160015302_RatingAddScore.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -357,6 +361,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201311152300072_UserAddImageUrl.resx">
       <DependentUpon>201311152300072_UserAddImageUrl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311160015302_RatingAddScore.resx">
+      <DependentUpon>201311160015302_RatingAddScore.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
