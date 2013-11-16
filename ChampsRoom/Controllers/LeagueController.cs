@@ -34,11 +34,9 @@ namespace ChampsRoom.Controllers
                 return HttpNotFound();
 
             var ratings = await db.Ratings
-                .Include(i => i.Player)
-                .Include(i => i.Team)
-                .Include(i => i.League)
                 .OrderByDescending(q => q.Created)
-                .Where(q => q.LeagueId == league.Id).ToListAsync();
+                .Where(q => q.LeagueId == league.Id)
+                .ToListAsync();
 
             var latestMatches = await db.Matches
                 .Take(20)
@@ -67,7 +65,7 @@ namespace ChampsRoom.Controllers
                     RankingChange = latestRating == null ? 0 : latestRating.RankingChange,
                     Rating = latestRating == null ? 1000 : latestRating.Rate,
                     RatingChange = latestRating == null ? 0 : latestRating.RatingChange,
-                    Score = latestRating == null ? 0 : latestRating.Score,
+                    Score = playerRatings.Sum(q => q.Score),
                     Team = null
                 };
 
