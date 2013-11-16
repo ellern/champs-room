@@ -55,7 +55,7 @@
                         <ul class="list-inline">
                             @foreach (var opponent in item.Opponent(Model.User))
                             {
-                                <li><a href="@Url.Action("Details", new { leagueUrl = Model.League.Url, playerUrl = opponent.Url })">@opponent.Name</a></li>
+                                <li><a href="@Url.Action("Details", new { leagueUrl = Model.League.Url, playerUrl = opponent.Url })">@opponent.UserName</a></li>
                             }
                         </ul>
                     </td>
