@@ -15,7 +15,6 @@ namespace ChampsRoom.Helpers
         public static int GetRank(Guid leagueId, string userId)
         {
             var ratings = db.Ratings
-                .AsNoTracking()
                 .OrderByDescending(q => q.Created)
                 .Where(q => q.LeagueId == leagueId)
                 .ToList();
@@ -24,7 +23,6 @@ namespace ChampsRoom.Helpers
                 return 0;
 
             var league = db.Leagues
-                .AsNoTracking()
                 .Include(i => i.Users)
                 .FirstOrDefault(q => q.Id == leagueId);
 
@@ -57,21 +55,22 @@ namespace ChampsRoom.Helpers
             rankings = rankings
                 .OrderByDescending(q => q.Rate)
                 .ThenByDescending(q => q.Won)
-                .ThenBy(q => q.Matches)                
+                .ThenByDescending(q => q.Draw)
+                .ThenBy(q => q.Matches)
                 .ThenBy(q => q.User.UserName)
                 .ToList();
 
             var rank = 1;
 
             foreach (var item in rankings)
-            { 
+            {
                 if (item.User.Id == userId)
                     return rank;
 
                 rank++;
             }
 
-            return 0;
+            return league.Users.Distinct().Count();
         }
     }
 }

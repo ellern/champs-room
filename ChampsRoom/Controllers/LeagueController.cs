@@ -33,9 +33,9 @@ namespace ChampsRoom.Controllers
             if (league == null)
                 return HttpNotFound();
 
-            var ratings = await db.Ratings
-                .OrderByDescending(q => q.Created)
+            var ratings = await db.Ratings                
                 .Where(q => q.LeagueId == league.Id)
+                .OrderByDescending(q => q.Created)
                 .ToListAsync();
 
             var latestMatches = await db.Matches
