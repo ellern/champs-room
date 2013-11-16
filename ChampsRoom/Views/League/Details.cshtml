@@ -1,16 +1,16 @@
 ﻿@model ChampsRoom.Models.LeagueDetailsViewModel
 
 <div class="row">
-    <div class="col-xs-12 col-sm-8 col-md-9">
-        <h1>@Model.League.Name</h1>
-    </div>
-    <div class="col-xs-12 col-sm-4 col-md-3">
-        <p class="lead">
+    <div class="col-xs-12 col-xs-12">
+        <h1>
+            @Model.League.Name
             @if (Request.IsAuthenticated)
             {
-                <a class="btn btn-large btn-info pull-right" href="@Url.Action("Create", "Result", new { leagueUrl = Model.League.Url })">Register result</a>
+                <span class="pull-right">
+                    <a class="btn btn-large btn-info pull-right" href="@Url.Action("Create", "Result", new { leagueUrl = Model.League.Url })">Register result</a>
+                </span>
             }
-        </p>
+        </h1>
     </div>
 </div>
 
@@ -78,10 +78,10 @@
 
 <div class="row text-center">
     <h1>Latest matches</h1>
-</div> 
+</div>
 
 <div class="row">
-    <div class="col-xs-12 col-md-12" >
+    <div class="col-xs-12 col-md-12">
 
         @foreach (var item in Model.LatestMatches)
         {
