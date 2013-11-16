@@ -8,6 +8,7 @@
 @using (Html.BeginForm())
 {
     @Html.Hidden("LeagueId", Model.League.Id)
+    @Html.Hidden("home", (Guid)ViewBag.PlayerId)
 
     <div class="row text-center">
         <h3>Players</h3>
