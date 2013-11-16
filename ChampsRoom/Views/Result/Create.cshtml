@@ -19,7 +19,7 @@
             <div class="well well-sm" style="height: 150px; overflow-y: auto;">
                 @foreach (var item in Model.Players)
                 {
-                    <label class="checkbox"><input class="checkbox-home" id="checkbox-home-@item.Id" type="checkbox" name="home" value="@item.Id" data-name="@item.Name" /> @item.Name</label>
+                    <label class="checkbox"><input class="checkbox-home" id="checkbox-home-@item.Id" type="checkbox" name="home" value="@item.Id" data-name="@item.Name" checked="@(item.Id == ViewBag.PlayerId)" disabled="@(item.Id == ViewBag.PlayerId)" /> @item.Name</label>
                 }
             </div>
         </div>
@@ -28,7 +28,7 @@
             <div class="well well-sm" style="height: 150px; overflow-y: auto;">
                 @foreach (var item in Model.Players)
                 {
-                    <label class="checkbox"><input class="checkbox-away" id="checkbox-away-@item.Id" type="checkbox" name="away" value="@item.Id" data-name="@item.Name" /> @item.Name</label>
+                    <label class="checkbox"><input class="checkbox-away" id="checkbox-away-@item.Id" type="checkbox" name="away" value="@item.Id" data-name="@item.Name" disabled="@(item.Id == ViewBag.PlayerId)" /> @item.Name</label>
                 }
             </div>
         </div>

@@ -62,6 +62,15 @@ namespace ChampsRoom.Controllers
 
             };
 
+            var userId = User.Identity.GetUserId();
+
+            var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userId);
+
+            if (user == null)
+                return HttpNotFound();
+
+            ViewBag.PlayerId = user.Player.Id;
+
             return View(viewmodel);
         }
 
