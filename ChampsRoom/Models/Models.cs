@@ -7,41 +7,6 @@ using System.Web;
 
 namespace ChampsRoom.Models
 {
-    public class Player
-    {
-        public Player()
-        {
-            this.Id = System.Guid.NewGuid();
-            this.AwayMatches = new HashSet<Match>();
-            this.HomeMatches = new HashSet<Match>();
-            this.Leagues = new HashSet<League>();
-            this.Teams = new HashSet<Team>();
-            this.Ratings = new HashSet<Rating>();
-        }
-
-        public Guid Id { get; set; }
-        [Required]
-        public string Name { get; set; }
-        public string Url { get; set; }
-
-        public ICollection<League> Leagues { get; set; }
-        public ICollection<Match> AwayMatches { get; set; }
-        public ICollection<Match> HomeMatches { get; set; }
-        public ICollection<Team> Teams { get; set; }
-        public ICollection<Rating> Ratings { get; set; }
-
-        public ICollection<Match> Matches {
-            get {
-
-                var matches = new List<Match>();
-                matches.AddRange(this.AwayMatches);
-                matches.AddRange(this.HomeMatches);
-
-                return matches;
-            }        
-        }
-    }
-
     public class League
     {
         public League()
@@ -53,7 +18,7 @@ namespace ChampsRoom.Models
             this.MinScore = 0;
 
             this.Matches = new HashSet<Match>();
-            this.Players = new HashSet<Player>();
+            this.Users = new HashSet<User>();
             this.Teams = new HashSet<Team>();
         }
 
@@ -67,7 +32,7 @@ namespace ChampsRoom.Models
         public string Rules { get; set; }
 
         public ICollection<Match> Matches { get; set; }
-        public ICollection<Player> Players { get; set; }
+        public ICollection<User> Users { get; set; }
         public ICollection<Team> Teams { get; set; }
     }
 
@@ -78,8 +43,8 @@ namespace ChampsRoom.Models
             this.Id = System.Guid.NewGuid();
             this.Created = DateTime.Now;
 
-            this.HomePlayers = new HashSet<Player>();
-            this.AwayPlayers = new HashSet<Player>();
+            this.HomeUsers = new HashSet<User>();
+            this.AwayUsers = new HashSet<User>();
             this.Ratings = new HashSet<Rating>();
             this.Sets = new HashSet<Set>();
         }
@@ -95,8 +60,8 @@ namespace ChampsRoom.Models
         public Team HomeTeam { get; set; }
         public Guid AwayTeamId { get; set; }
         public Team AwayTeam { get; set; }
-        public ICollection<Player> HomePlayers { get; set; }
-        public ICollection<Player> AwayPlayers { get; set; }
+        public ICollection<User> HomeUsers { get; set; }
+        public ICollection<User> AwayUsers { get; set; }
         public ICollection<Rating> Ratings { get; set; }
         public ICollection<Set> Sets { get; set; }
 
@@ -139,38 +104,38 @@ namespace ChampsRoom.Models
             return new HtmlString(result.Substring(0, result.Length - 6));
         }
 
-        public string GetOpponent(Player player)
+        public string GetOpponent(User user)
         {
             var result = String.Empty;
 
-            if (this.HomePlayers.Contains(player))
-                return String.Join(", ", this.AwayPlayers.Select(x => x.Name));
+            if (this.HomeUsers.Contains(user))
+                return String.Join(", ", this.AwayUsers.Select(x => x.UserName));
 
-            if (this.AwayPlayers.Contains(player))
-                return String.Join(", ", this.HomePlayers.Select(x => x.Name));
+            if (this.AwayUsers.Contains(user))
+                return String.Join(", ", this.HomeUsers.Select(x => x.UserName));
 
             return result;
         }
 
-        public IQueryable<Player> Opponent(Player player)
+        public IQueryable<User> Opponent(User user)
         {
-            if (this.HomePlayers.Contains(player))
-                return this.AwayPlayers.AsQueryable();
+            if (this.HomeUsers.Contains(user))
+                return this.AwayUsers.AsQueryable();
 
-            if (this.AwayPlayers.Contains(player))
-                return this.HomePlayers.AsQueryable();
+            if (this.AwayUsers.Contains(user))
+                return this.HomeUsers.AsQueryable();
 
-            return new List<Player>().AsQueryable();
+            return new List<User>().AsQueryable();
         }
 
-        public Rating GetRating(Player player)
+        public Rating GetRating(User user)
         {
             var rating = new Rating() { Rank = 0, RankingChange = 0, Rate = 0, RatingChange = 0 };
 
             if (this.Ratings == null)
                 return rating;
 
-            var result = this.Ratings.FirstOrDefault(q => q.PlayerId == player.Id);
+            var result = this.Ratings.FirstOrDefault(q => q.UserId == user.Id);
 
             if (result == null)
                 return rating;
@@ -178,15 +143,15 @@ namespace ChampsRoom.Models
             return result;
         }
 
-        public bool PlayerWon(Player player)
+        public bool UserWon(User user)
         {
             if (this.Draw)
                 return false;
 
-            if (this.HomePlayers.Contains(player) && this.HomeWon)
+            if (this.HomeUsers.Contains(user) && this.HomeWon)
                 return true;
 
-            if (this.AwayPlayers.Contains(player) && this.AwayWon)
+            if (this.AwayUsers.Contains(user) && this.AwayWon)
                 return true;
 
             return false;
@@ -216,8 +181,8 @@ namespace ChampsRoom.Models
         public League League { get; set; }
         public Guid MatchId { get; set; }
         public Match Match { get; set; }
-        public Guid PlayerId { get; set; }
-        public Player Player { get; set; }
+        public string UserId { get; set; }
+        public User User { get; set; }
         public Guid TeamId { get; set; }
         public Team Team { get; set; }
     }
@@ -243,7 +208,7 @@ namespace ChampsRoom.Models
         public Team()
         {
             this.Id = System.Guid.NewGuid();
-            this.Players = new HashSet<Player>();
+            this.Users = new HashSet<User>();
             this.Ratings = new HashSet<Rating>();
             this.Leagues = new HashSet<League>();
             this.AwayMatches = new HashSet<Match>();
@@ -255,7 +220,7 @@ namespace ChampsRoom.Models
         public string Name { get; set; }
         public string Url { get; set; }
 
-        public ICollection<Player> Players { get; set; }
+        public ICollection<User> Users { get; set; }
         public ICollection<Rating> Ratings { get; set; }
         public ICollection<League> Leagues { get; set; }
         public ICollection<Match> AwayMatches { get; set; }

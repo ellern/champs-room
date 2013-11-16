@@ -83,13 +83,11 @@ namespace ChampsRoom.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = new User() { UserName = model.UserName };
+                var user = new User() { UserName = model.UserName, Url = model.UserName.ToFriendlyUrl() };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     await SignInAsync(user, isPersistent: false);
-
-                    await AttachPlayerAsync(user.Id);
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -127,21 +125,20 @@ namespace ChampsRoom.Controllers
         public async Task<ActionResult> Edit(EditViewModel model)
         {
             var userid = User.Identity.GetUserId();
-            var user = await db.Users.Include(i => i.Player).FirstOrDefaultAsync(q => q.Id == userid);
+            var user = await db.Users.FirstOrDefaultAsync(q => q.Id == userid);
 
-            if (user == null || user.Player == null)
+            if (user == null)
                 return HttpNotFound();
 
-            if (!await IsNameAvailable(model.UserName, user.Player.Name))
+            if (!await IsNameAvailable(model.UserName, user.UserName))
                 ModelState.AddModelError(String.Empty, "Name is not available");
 
             if (ModelState.IsValid)
             {
                 user.ImageUrl = model.ImageUrl;
                 user.UserName = model.UserName;
-
-                user.Player.Name = model.UserName;
-                user.Player.Url = model.UserName.ToFriendlyUrl();
+                user.UserName = model.UserName;
+                user.Url = model.UserName.ToFriendlyUrl();
 
                 db.Entry(user).State = EntityState.Modified;
 
@@ -180,9 +177,6 @@ namespace ChampsRoom.Controllers
                 : "";
             ViewBag.HasLocalPassword = HasPassword();
             ViewBag.ReturnUrl = Url.Action("Manage");
-
-            //var userId = User.Identity.GetUserId();
-            //ViewBag.Leagues = db.Leagues.Where(q => q.Players.Any(u => u.Id == userId)).ToList();
 
             return View();
         }
@@ -233,7 +227,7 @@ namespace ChampsRoom.Controllers
             }
 
             //var userId = User.Identity.GetUserId();
-            //ViewBag.Leagues = db.Leagues.Where(q => q.Players.Any(u => u.Id == userId)).ToList();
+            //ViewBag.Leagues = db.Leagues.Where(q => q.Users.Any(u => u.Id == userId)).ToList();
 
             // If we got this far, something failed, redisplay form
             return View(model);
@@ -269,7 +263,7 @@ namespace ChampsRoom.Controllers
             {
                 if (!String.IsNullOrWhiteSpace(loginInfo.DefaultUserName))
                 {
-                    user = new User() { UserName = loginInfo.DefaultUserName };
+                    user = new User() { UserName = loginInfo.DefaultUserName, Url = loginInfo.DefaultUserName.ToFriendlyUrl() };
                     var result = await UserManager.CreateAsync(user);
                     if (result.Succeeded)
                     {
@@ -278,7 +272,6 @@ namespace ChampsRoom.Controllers
                         {
                             await OnExternalLoginAuth(user);
                             await SignInAsync(user, isPersistent: false);
-                            await AttachPlayerAsync(user.Id);
 
                             return RedirectToLocal(returnUrl);
                         }
@@ -334,7 +327,7 @@ namespace ChampsRoom.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new User() { UserName = model.UserName };
+                var user = new User() { UserName = model.UserName, Url = model.UserName.ToFriendlyUrl() };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -343,7 +336,6 @@ namespace ChampsRoom.Controllers
                     {
                         await OnExternalLoginAuth(user);
                         await SignInAsync(user, isPersistent: false);
-                        await AttachPlayerAsync(user.Id);
 
                         return RedirectToLocal(returnUrl);
                     }
@@ -406,7 +398,6 @@ namespace ChampsRoom.Controllers
 
             if (!String.IsNullOrWhiteSpace(user.ImageUrl))
                 identity.AddClaim(new Claim("ImageUrl", user.ImageUrl));
-            //identity.AddClaim(new Claim("Player", JsonConvert.SerializeObject(user.Player)));
 
             AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
         }
@@ -489,9 +480,18 @@ namespace ChampsRoom.Controllers
                                  "leagues",
                                  "team",
                                  "teams",
+                                 "user",
+                                 "users",
                                  "player",
                                  "players",
                                  "admin",
+                                 "index",
+                                 "create",
+                                 "edit",
+                                 "details",
+                                 "delete",
+                                 "put",
+                                 "post",
                                  "home"
                              };
 
@@ -503,25 +503,10 @@ namespace ChampsRoom.Controllers
             if (notAllowed.Count(q => q.Equals(name, StringComparison.InvariantCultureIgnoreCase)) > 0)
                 return false;
 
-            var count = await db.Players.CountAsync(q => q.Url.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            var count = await db.Users.CountAsync(q => q.Url.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
 
             return count == 0;
-        }
-
-        private async Task AttachPlayerAsync(string userId)
-        {
-            var user = db.Users.Find(userId);
-
-            var player = new Player()
-            {
-                Name = user.UserName,
-                Url = user.UserName.ToFriendlyUrl()
-            };
-
-            user.Player = player;
-
-            await db.SaveChangesAsync();
         }
 
         private async Task SetTwitterProfileImage(string userId, IEnumerable<Claim> claims)

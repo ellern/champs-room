@@ -6,13 +6,13 @@
 
     foreach (var item in Model.Matches.Take(50))
     {
-        chartRanking = String.Format(",[{0},{1}]", counter, item.GetRating(Model.Player).Rank) + chartRanking;
-        chartRating = String.Format(",[{0},{1}]", counter--, item.GetRating(Model.Player).Rate) + chartRating;
+        chartRanking = String.Format(",[{0},{1}]", counter, item.GetRating(Model.User).Rank) + chartRanking;
+        chartRating = String.Format(",[{0},{1}]", counter--, item.GetRating(Model.User).Rate) + chartRating;
     }    
 }
 
 <div class="row text-center">
-    <h1>@Model.Player.Name</h1>
+    <h1>@Model.User.UserName</h1>
     <p class="lead">All matches played in @Html.ActionLink(Model.League.Name, "Details", "League", new { id = Model.League.Url }, null)</p>
 </div>
 
@@ -48,12 +48,12 @@
             </thead>
             @foreach (var item in Model.Matches)
             {
-                var rating = item.GetRating(Model.Player);
+                var rating = item.GetRating(Model.User);
                 <tr>
                     <td>@item.Created.ToShortDateString() @item.Created.ToShortTimeString()</td>
                     <td>
                         <ul class="list-inline">
-                            @foreach (var opponent in item.Opponent(Model.Player))
+                            @foreach (var opponent in item.Opponent(Model.User))
                             {
                                 <li><a href="@Url.Action("Details", new { leagueUrl = Model.League.Url, playerUrl = opponent.Url })">@opponent.Name</a></li>
                             }
@@ -65,7 +65,7 @@
                         {
                             <span class="label label-default">@item.GetHomeSetScore()</span> <span class="label label-default">@item.GetAwaySetScore()</span>
                         }
-                        else if (item.PlayerWon(Model.Player))
+                        else if (item.UserWon(Model.User))
                         {
                             <span class="label label-success">@item.GetHomeSetScore()</span> <span class="label label-success">@item.GetAwaySetScore()</span>
                         }

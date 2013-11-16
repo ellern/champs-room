@@ -16,21 +16,21 @@ namespace ChampsRoom.Controllers
     {
         private DataContext db = new DataContext();
 
-        [Route("~/leagues/{leagueUrl}/{playerUrl}/results")]
-        public async Task<ActionResult> Details(string leagueUrl, string playerUrl)
+        [Route("~/leagues/{leagueUrl}/{userUrl}/results")]
+        public async Task<ActionResult> Details(string leagueUrl, string userUrl)
         {
-            var player = await db.Players
+            var user = await db.Users
                 .Include(i => i.AwayMatches.Select(y => y.Sets))
                 .Include(i => i.AwayMatches.Select(y => y.Ratings))
-                .Include(i => i.AwayMatches.Select(y => y.AwayPlayers))
-                .Include(i => i.AwayMatches.Select(y => y.HomePlayers))
+                .Include(i => i.AwayMatches.Select(y => y.AwayUsers))
+                .Include(i => i.AwayMatches.Select(y => y.HomeUsers))
                 .Include(i => i.HomeMatches.Select(y => y.Sets))
                 .Include(i => i.HomeMatches.Select(y => y.Ratings))
-                .Include(i => i.HomeMatches.Select(y => y.AwayPlayers))
-                .Include(i => i.HomeMatches.Select(y => y.HomePlayers))
-                .FirstOrDefaultAsync(q => q.Url.Equals(playerUrl, StringComparison.InvariantCultureIgnoreCase));
+                .Include(i => i.HomeMatches.Select(y => y.AwayUsers))
+                .Include(i => i.HomeMatches.Select(y => y.HomeUsers))
+                .FirstOrDefaultAsync(q => q.Url.Equals(userUrl, StringComparison.InvariantCultureIgnoreCase));
                                
-            if (player == null)
+            if (user == null)
                 return HttpNotFound();
 
             var league = await db.Leagues.FirstOrDefaultAsync(q => q.Url.Equals(leagueUrl, StringComparison.InvariantCultureIgnoreCase));
@@ -38,8 +38,8 @@ namespace ChampsRoom.Controllers
             var viewmodel = new LeagueMatchesViewModel()
             {
                 League = league,
-                Matches = player.Matches.Where(q => q.LeagueId == league.Id).OrderByDescending(q => q.Created).ToList(),
-                Player = player
+                Matches = user.Matches.Where(q => q.LeagueId == league.Id).OrderByDescending(q => q.Created).ToList(),
+                User = user
             };
 
             return View(viewmodel);
@@ -49,7 +49,7 @@ namespace ChampsRoom.Controllers
         [Route("~/leagues/{leagueUrl}/result")]
         public async Task<ActionResult> Create(string leagueUrl)
         {
-            var leagues = await db.Leagues.Include(q => q.Players).FirstOrDefaultAsync(q => q.Url.Equals(leagueUrl, StringComparison.InvariantCultureIgnoreCase));
+            var leagues = await db.Leagues.Include(q => q.Users).FirstOrDefaultAsync(q => q.Url.Equals(leagueUrl, StringComparison.InvariantCultureIgnoreCase));
 
             if (leagues == null)
                 return HttpNotFound();
@@ -58,18 +58,9 @@ namespace ChampsRoom.Controllers
             {
                 Match = new Match(),
                 League = leagues,
-                Players = db.Players.OrderBy(q => q.Name).ToList()
+                Users = db.Users.OrderBy(q => q.UserName).ToList()
 
             };
-
-            var userId = User.Identity.GetUserId();
-
-            var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userId);
-
-            if (user == null)
-                return HttpNotFound();
-
-            ViewBag.PlayerId = user.Player.Id;
 
             return View(viewmodel);
         }
@@ -77,53 +68,50 @@ namespace ChampsRoom.Controllers
         [Authorize]
         [HttpPost]
         [Route("~/leagues/{leagueUrl}/result")]
-        public async Task<ActionResult> Create(Guid leagueId, List<Guid> home, List<Guid> away, List<int?> homeScore, List<int?> awayScore)
+        public async Task<ActionResult> Create(Guid leagueId, List<string> home, List<string> away, List<int?> homeScore, List<int?> awayScore)
         {
             var league = await db.Leagues
-                .Include(i => i.Players)
-                .Include(i => i.Teams.Select(u => u.Players))
+                .Include(i => i.Users)
+                .Include(i => i.Teams.Select(u => u.Users))
                 .FirstOrDefaultAsync(q => q.Id == leagueId);
 
             if (league == null)
                 return HttpNotFound();
 
-            #region Find Players and Teams
+            #region Find Users and Teams
 
-            var userid = User.Identity.GetUserId();
+            var userId = User.Identity.GetUserId();
 
-            var homePlayers = db.Players.Include(i => i.Teams).Where(q => home.Contains(q.Id));
-            var awayPlayers = db.Players.Include(i => i.Teams).Where(q => away.Contains(q.Id));
+            home.Add(userId);
 
-            var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userid);
+            var homeUsers = db.Users.Include(i => i.Teams).Where(q => home.Contains(q.Id));
+            var awayUsers = db.Users.Include(i => i.Teams).Where(q => away.Contains(q.Id));
 
-            if (user == null)
+            var userFound = false;
+
+            foreach (var item in homeUsers)
+                if (!userFound)
+                    userFound = item.Id == userId;
+
+            foreach (var item in awayUsers)
+                if (!userFound)
+                    userFound = item.Id == userId;
+
+            if (!userFound)
                 return HttpNotFound();
 
-            var userPlayerFound = false;
-
-            foreach (var player in homePlayers)
-                if (!userPlayerFound)
-                    userPlayerFound = player.Id == user.Player.Id;
-
-            foreach (var player in awayPlayers)
-                if (!userPlayerFound)
-                    userPlayerFound = player.Id == user.Player.Id;
-
-            if (!userPlayerFound)
-                return HttpNotFound();
-
-            var allTeams = db.Teams.Include(i => i.Players);
-            var homeTeam = allTeams.Where(p => !p.Players.Select(c => c.Id).Except(home).Union(home.Except(p.Players.Select(c => c.Id))).Any()).FirstOrDefault();
-            var awayTeam = allTeams.Where(p => !p.Players.Select(c => c.Id).Except(away).Union(away.Except(p.Players.Select(c => c.Id))).Any()).FirstOrDefault();
+            var allTeams = db.Teams.Include(i => i.Users);
+            var homeTeam = allTeams.Where(p => !p.Users.Select(c => c.Id).Except(home).Union(home.Except(p.Users.Select(c => c.Id))).Any()).FirstOrDefault();
+            var awayTeam = allTeams.Where(p => !p.Users.Select(c => c.Id).Except(away).Union(away.Except(p.Users.Select(c => c.Id))).Any()).FirstOrDefault();
 
             if (homeTeam == null)
             {
                 homeTeam = new Team();
 
-                foreach (var player in db.Players.Where(q => home.Contains(q.Id)))
-                    homeTeam.Players.Add(player);
+                foreach (var item in db.Users.Where(q => home.Contains(q.Id)))
+                    homeTeam.Users.Add(item);
 
-                homeTeam.Name = String.Join("+", homeTeam.Players.Select(q => q.Name));
+                homeTeam.Name = String.Join("+", homeTeam.Users.Select(q => q.UserName));
                 homeTeam.Url = homeTeam.Name.ToFriendlyUrl();
 
                 db.Teams.Add(homeTeam);
@@ -133,22 +121,22 @@ namespace ChampsRoom.Controllers
             {
                 awayTeam = new Team();
 
-                foreach (var player in db.Players.Where(q => away.Contains(q.Id)))
-                    awayTeam.Players.Add(player);
+                foreach (var user in db.Users.Where(q => away.Contains(q.Id)))
+                    awayTeam.Users.Add(user);
 
-                awayTeam.Name = String.Join("+", awayTeam.Players.Select(q => q.Name));
+                awayTeam.Name = String.Join("+", awayTeam.Users.Select(q => q.UserName));
                 awayTeam.Url = awayTeam.Name.ToFriendlyUrl();
 
                 db.Teams.Add(awayTeam);
             }
 
-            foreach (var player in awayTeam.Players)
-                if (!league.Players.Contains(player))
-                    league.Players.Add(player);
+            foreach (var item in awayTeam.Users)
+                if (!league.Users.Contains(item))
+                    league.Users.Add(item);
 
-            foreach (var player in homeTeam.Players)
-                if (!league.Players.Contains(player))
-                    league.Players.Add(player);
+            foreach (var item in homeTeam.Users)
+                if (!league.Users.Contains(item))
+                    league.Users.Add(item);
 
             if (!league.Teams.Contains(awayTeam))
                 league.Teams.Add(awayTeam);
@@ -173,36 +161,36 @@ namespace ChampsRoom.Controllers
 
             #region Ratings
 
-            var ratingHome = new List<Tuple<Guid, int, int, int, int>>();
-            var ratingAway = new List<Tuple<Guid, int, int, int, int>>();
+            var ratingHome = new List<Tuple<string, int, int, int, int>>();
+            var ratingAway = new List<Tuple<string, int, int, int, int>>();
 
-            foreach (var item in homeTeam.Players)
+            foreach (var item in homeTeam.Users)
             {
-                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == item.Id);
+                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.User.Id == item.Id);
                 var rating = latestRating == null ? 1000 : latestRating.Rate;
-                var rank = latestRating == null ? league.Players.Count : latestRating.Rank;
-                ratingHome.Add(new Tuple<Guid, int, int, int, int>(item.Id, rating, rank, 0, 0));
+                var rank = latestRating == null ? league.Users.Count : latestRating.Rank;
+                ratingHome.Add(new Tuple<string, int, int, int, int>(item.Id, rating, rank, 0, 0));
             }
 
-            foreach (var item in awayTeam.Players)
+            foreach (var item in awayTeam.Users)
             {
-                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == item.Id);
+                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.User.Id == item.Id);
                 var rating = latestRating == null ? 1000 : latestRating.Rate;
-                var rank = latestRating == null ? league.Players.Count : latestRating.Rank;
-                ratingAway.Add(new Tuple<Guid, int, int, int, int>(item.Id, rating, rank, 0, 0));
+                var rank = latestRating == null ? league.Users.Count : latestRating.Rank;
+                ratingAway.Add(new Tuple<string, int, int, int, int>(item.Id, rating, rank, 0, 0));
             }
 
-            var avgHome = ratingHome.Sum(q => q.Item2) / homeTeam.Players.Count;
-            var avgAway = ratingAway.Sum(q => q.Item2) / awayTeam.Players.Count;
+            var avgHome = ratingHome.Sum(q => q.Item2) / homeTeam.Users.Count;
+            var avgAway = ratingAway.Sum(q => q.Item2) / awayTeam.Users.Count;
             var homeWon = homeWins > awayWins;
             var awayWon = awayWins > homeWins;
             var draw = homeWins == awayWins;
             var elorating = EloRating.CalculateChange(avgHome, avgAway, homeWins, awayWins);
             var ratings = new List<Rating>();
 
-            foreach (var player in homeTeam.Players)
+            foreach (var item in homeTeam.Users)
             {
-                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == player.Id);
+                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.User.Id == item.Id);
                 var ratingChange = homeWon ? System.Math.Abs(elorating) : System.Math.Abs(elorating) * -1;
 
                 ratings.Add(new Rating()
@@ -211,7 +199,7 @@ namespace ChampsRoom.Controllers
                     Lost = awayWon,
                     Won = homeWon,
                     League = league,
-                    Player = player,
+                    User = item,
                     Team = homeTeam,
                     Rank = 0,
                     RankingChange = 0,
@@ -222,9 +210,9 @@ namespace ChampsRoom.Controllers
                 });
             }
 
-            foreach (var player in awayTeam.Players)
+            foreach (var item in awayTeam.Users)
             {
-                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == player.Id);
+                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.User.Id == item.Id);
                 var ratingChange = awayWon ? System.Math.Abs(elorating) : System.Math.Abs(elorating) * -1;
 
                 ratings.Add(new Rating()
@@ -233,7 +221,7 @@ namespace ChampsRoom.Controllers
                     Lost = homeWon,
                     Won = awayWon,
                     League = league,
-                    Player = player,
+                    User = item,
                     Team = awayTeam,
                     Rank = 0,
                     RankingChange = 0,
@@ -248,11 +236,11 @@ namespace ChampsRoom.Controllers
 
             var match = new Match()
             {
-                AwayPlayers = awayTeam.Players,
+                AwayUsers = awayTeam.Users,
                 AwayTeam = awayTeam,
                 AwayWon = awayWon,
                 Draw = draw,
-                HomePlayers = homeTeam.Players,
+                HomeUsers = homeTeam.Users,
                 HomeTeam = homeTeam,
                 HomeWon = homeWon,
                 League = league,
@@ -266,22 +254,22 @@ namespace ChampsRoom.Controllers
 
             #region Update ranking post match
 
-            foreach (var player in homeTeam.Players)
+            foreach (var item in homeTeam.Users)
             {
-                var rank = Stats.GetRank(league.Id, player.Id);
-                var rating = ratings.FirstOrDefault(q => q.PlayerId == player.Id);
+                var rank = Stats.GetRank(league.Id, item.Id);
+                var rating = ratings.FirstOrDefault(q => q.UserId == item.Id);
                 rating.Rank = rank;
-                rating.RankingChange = ratingHome.FirstOrDefault(q => q.Item1 == player.Id).Item3 - rank;
+                rating.RankingChange = ratingHome.FirstOrDefault(q => q.Item1 == item.Id).Item3 - rank;
 
                 db.Entry(rating).State = EntityState.Modified;
             }
 
-            foreach (var player in awayTeam.Players)
+            foreach (var item in awayTeam.Users)
             {
-                var rank = Stats.GetRank(league.Id, player.Id);
-                var rating = ratings.FirstOrDefault(q => q.PlayerId == player.Id);
+                var rank = Stats.GetRank(league.Id, item.Id);
+                var rating = ratings.FirstOrDefault(q => q.UserId == item.Id);
                 rating.Rank = rank;
-                rating.RankingChange = ratingAway.FirstOrDefault(q => q.Item1 == player.Id).Item3 - rank;
+                rating.RankingChange = ratingAway.FirstOrDefault(q => q.Item1 == item.Id).Item3 - rank;
 
                 db.Entry(rating).State = EntityState.Modified;
             }

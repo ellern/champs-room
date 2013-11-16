@@ -62,11 +62,11 @@
                             <img src="~/content/images/rank-last.gif" style="height: 16px; top: -1px; left: 3px; position: relative;" alt="" />
                         }
                     </td>
-                    <td>@Html.ActionLink(item.Player.Name ?? "Unknown", "Details", "Result", new { leagueUrl = Model.League.Url, playerUrl = item.Player.Url }, null)</td>
+                    <td>@Html.ActionLink(item.User.UserName, "Details", "Result", new { leagueUrl = Model.League.Url, userUrl = item.User.Url }, null)</td>
                     <td class="text-center">
-                        @item.Rating <small class="text-muted">@item.RatingChange.DisplayChange()</small>
+                        @item.Rate <small class="text-muted">@item.RatingChange.DisplayChange()</small>
                     </td>
-                    <td class="text-center hidden-xs">@item.Played</td>
+                    <td class="text-center hidden-xs">@item.Matches</td>
                     <td class="text-center">@item.Won</td>
                     <td class="text-center">@item.Lost</td>
                     <td class="text-center">@item.Score.DisplayChange()</td>

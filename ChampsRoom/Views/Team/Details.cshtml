@@ -25,9 +25,9 @@
 
 <div class="row">
     <div class="col-xs-12 col-md-12 text-center">
-        @foreach (var item in Model.Players)
+        @foreach (var item in Model.Users)
         {
-            <a href="@Url.Action("Details", "Player", new { playerUrl = item.Url })" class="btn btn-default btn-info">@item.Name</a>
+            <a href="@Url.Action("Details", "User", new { userUrl = item.Url })" class="btn btn-default btn-info">@item.UserName</a>
         }
     </div>
 </div>

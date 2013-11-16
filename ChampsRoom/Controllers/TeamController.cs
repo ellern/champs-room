@@ -19,17 +19,15 @@ namespace ChampsRoom.Controllers
         public async Task<ActionResult> Index()
         {
             var teams = await db.Teams
-                .Include(i => i.Players)
+                .Include(i => i.Users)
                 .Include(i => i.Leagues)
                 .ToListAsync();
 
-            ViewBag.PlayerId = GetPlayerId();
-
-            var viewmodel = new OverviewTeamPlayersViewModel()
+            var viewmodel = new OverviewTeamUsersViewModel()
             {
                 League = null,
-                Teams = teams.Where(q => q.Players.Count > 1).ToList(),
-                Players = teams.Where(q => q.Players.Count == 1).SelectMany(q => q.Players).ToList()
+                Teams = teams.Where(q => q.Users.Count > 1).ToList(),
+                Users = teams.Where(q => q.Users.Count == 1).SelectMany(q => q.Users).ToList()
             };
 
             return View(viewmodel);
@@ -39,7 +37,7 @@ namespace ChampsRoom.Controllers
         public async Task<ActionResult> Details(string teamUrl)
         {
             var team = await db.Teams
-                .Include(i => i.Players)
+                .Include(i => i.Users)
                 .Include(i => i.Leagues)
                 .FirstOrDefaultAsync(q => q.Url.Equals(teamUrl, StringComparison.InvariantCultureIgnoreCase));
 
@@ -53,7 +51,7 @@ namespace ChampsRoom.Controllers
         [Route("{teamUrl}/edit")]
         public async Task<ActionResult> Edit(string teamUrl)
         {
-            var team = await db.Teams.Include(q => q.Players).Include(q => q.Leagues).Include(q => q.Players).FirstOrDefaultAsync(q => q.Url.Equals(teamUrl, StringComparison.InvariantCultureIgnoreCase));
+            var team = await db.Teams.Include(q => q.Users).Include(q => q.Leagues).Include(q => q.Users).FirstOrDefaultAsync(q => q.Url.Equals(teamUrl, StringComparison.InvariantCultureIgnoreCase));
 
             if (team == null || !Helpers.DbHelper.CanEditTeam(team))
                 return HttpNotFound();
@@ -67,7 +65,7 @@ namespace ChampsRoom.Controllers
         [Route("{teamUrl}/edit")]
         public async Task<ActionResult> Edit(string teamUrl, Team model)
         {
-            var team = await db.Teams.Include(i => i.Players).FirstOrDefaultAsync(q => q.Id == model.Id);
+            var team = await db.Teams.Include(i => i.Users).FirstOrDefaultAsync(q => q.Id == model.Id);
 
             if (team == null || !Helpers.DbHelper.CanEditTeam(team))
                 return HttpNotFound();
@@ -94,22 +92,6 @@ namespace ChampsRoom.Controllers
 
             return View(model);
         }
-
-        private Guid GetPlayerId()
-        {
-            if (!Request.IsAuthenticated)
-                return Guid.Empty;
-
-            var userId = User.Identity.GetUserId();
-            var player = db.Users.AsNoTracking().Include(i => i.Player).FirstOrDefault(q => q.Id == userId);
-
-            if (player != null)
-                return player.Player.Id;
-
-            return Guid.Empty;
-        }
-
-
 
         protected override void Dispose(bool disposing)
         {

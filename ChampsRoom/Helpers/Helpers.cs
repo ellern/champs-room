@@ -20,26 +20,20 @@ namespace ChampsRoom.Helpers
                 return false;
 
             var userId = HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userId);
+            var user = db.Users.FirstOrDefault(q => q.Id == userId);
 
-            if (team.Players.FirstOrDefault(q => q.Id == user.Player.Id) == null)
+            if (team.Users.FirstOrDefault(q => q.Id == user.Id) == null)
                 return false;
 
             return true;
         }
 
-        public static bool CanEditPlayer(Player player)
+        public static bool CanEditUser(User user)
         {
-            if (player == null || !HttpContext.Current.Request.IsAuthenticated)
+            if (user == null || !HttpContext.Current.Request.IsAuthenticated)
                 return false;
 
-            var userId = HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userId);
-
-            if (player.Id == user.Player.Id)
-                return true;
-
-            return false;
+            return user.Id == HttpContext.Current.User.Identity.GetUserId();
         }
     }
 }

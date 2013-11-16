@@ -41,31 +41,31 @@ namespace ChampsRoom.Controllers
             var latestMatches = await db.Matches
                 .Take(20)
                 .Include(i => i.Sets)
-                .Include(i => i.AwayPlayers)
-                .Include(i => i.HomePlayers)
+                .Include(i => i.AwayUsers)
+                .Include(i => i.HomeUsers)
                 .Include(i => i.AwayTeam)
                 .Include(i => i.HomeTeam)
                 .OrderByDescending(q => q.Created).ToListAsync();
 
             var rankings = new List<RankingViewModel>();
 
-            foreach (var player in ratings.Select(q => q.Player).Distinct())
+            foreach (var user in ratings.Select(q => q.User).Distinct())
             {
-                var playerRatings = ratings.Where(q => q.PlayerId == player.Id);
-                var latestRating = playerRatings.FirstOrDefault();
+                var userRatings = ratings.Where(q => q.UserId == user.Id);
+                var userLatestRating = userRatings.FirstOrDefault();
 
                 var ranking = new RankingViewModel()
                 {
-                    Draw = playerRatings.Count(q => q.Draw == true),
-                    Lost = playerRatings.Count(q => q.Lost == true),
-                    Won = playerRatings.Count(q => q.Won == true),
-                    Played = playerRatings.Count(),
-                    Player = player,
-                    Rank = latestRating == null ? 0 : latestRating.Rank,
-                    RankingChange = latestRating == null ? 0 : latestRating.RankingChange,
-                    Rating = latestRating == null ? 1000 : latestRating.Rate,
-                    RatingChange = latestRating == null ? 0 : latestRating.RatingChange,
-                    Score = playerRatings.Sum(q => q.Score),
+                    Draw = userRatings.Count(q => q.Draw == true),
+                    Lost = userRatings.Count(q => q.Lost == true),
+                    Won = userRatings.Count(q => q.Won == true),
+                    Matches = userRatings.Count(),
+                    User = user,
+                    Rank = userLatestRating == null ? 0 : userLatestRating.Rank,
+                    RankingChange = userLatestRating == null ? 0 : userLatestRating.RankingChange,
+                    Rate = userLatestRating == null ? 1000 : userLatestRating.Rate,
+                    RatingChange = userLatestRating == null ? 0 : userLatestRating.RatingChange,
+                    Score = userRatings.Sum(q => q.Score),
                     Team = null
                 };
 
@@ -77,11 +77,11 @@ namespace ChampsRoom.Controllers
                 LatestMatches = latestMatches,
                 League = league,
                 Rankings = rankings
-                    .OrderByDescending(q => q.Rating)
+                    .OrderByDescending(q => q.Rate)
                     .ThenByDescending(q => q.Won)
                     .ThenByDescending(q => q.Draw)
-                    .ThenBy(q => q.Played)
-                    .ThenBy(q => q.Player.Name)
+                    .ThenBy(q => q.Matches)
+                    .ThenBy(q => q.User.UserName)
                     .ToList()
             };
 

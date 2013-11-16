@@ -12,7 +12,7 @@ namespace ChampsRoom.Helpers
     {
         static DataContext db = new DataContext();
 
-        public static int GetRank(Guid leagueId, Guid playerId)
+        public static int GetRank(Guid leagueId, string userId)
         {
             var ratings = db.Ratings
                 .AsNoTracking()
@@ -25,7 +25,7 @@ namespace ChampsRoom.Helpers
 
             var league = db.Leagues
                 .AsNoTracking()
-                .Include(i => i.Players)
+                .Include(i => i.Users)
                 .FirstOrDefault(q => q.Id == leagueId);
 
             if (league == null)
@@ -33,9 +33,9 @@ namespace ChampsRoom.Helpers
 
             var rankings = new List<RankingViewModel>();
 
-            foreach (var player in league.Players.Distinct())
+            foreach (var item in league.Users.Distinct())
             {
-                var userRatings = ratings.Where(q => q.PlayerId == player.Id);
+                var userRatings = ratings.Where(q => q.UserId == item.Id);
                 var latestRating = userRatings.FirstOrDefault();
 
                 var ranking = new RankingViewModel()
@@ -43,10 +43,10 @@ namespace ChampsRoom.Helpers
                     Draw = userRatings.Count(q => q.Draw == true),
                     Lost = userRatings.Count(q => q.Lost == true),
                     Won = userRatings.Count(q => q.Won == true),
-                    Played = userRatings.Count(),
-                    Player = player,
+                    Matches = userRatings.Count(),
+                    User = item,
                     Rank = latestRating == null ? 0 : latestRating.Rank,
-                    Rating = latestRating == null ? 1000 : latestRating.Rate,
+                    Rate = latestRating == null ? 1000 : latestRating.Rate,
                     RatingChange = latestRating == null ? 0 : latestRating.RatingChange,
                     Team = null
                 };
@@ -55,17 +55,17 @@ namespace ChampsRoom.Helpers
             }
 
             rankings = rankings
-                .OrderByDescending(q => q.Rating)
+                .OrderByDescending(q => q.Rate)
                 .ThenByDescending(q => q.Won)
-                .ThenBy(q => q.Played)                
-                .ThenBy(q => q.Player.Name)
+                .ThenBy(q => q.Matches)                
+                .ThenBy(q => q.User.UserName)
                 .ToList();
 
             var rank = 1;
 
             foreach (var item in rankings)
             { 
-                if (item.Player.Id == playerId)
+                if (item.User.Id == userId)
                     return rank;
 
                 rank++;

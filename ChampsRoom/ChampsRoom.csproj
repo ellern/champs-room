@@ -194,7 +194,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LeagueController.cs" />
-    <Compile Include="Controllers\PlayerController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ResultController.cs" />
     <Compile Include="Controllers\TeamController.cs" />
     <Compile Include="Global.asax.cs">
@@ -223,6 +223,10 @@
     <Compile Include="Migrations\201311160015302_RatingAddScore.cs" />
     <Compile Include="Migrations\201311160015302_RatingAddScore.Designer.cs">
       <DependentUpon>201311160015302_RatingAddScore.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311160958249_PlayerToUserRefactor.cs" />
+    <Compile Include="Migrations\201311160958249_PlayerToUserRefactor.Designer.cs">
+      <DependentUpon>201311160958249_PlayerToUserRefactor.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -340,7 +344,7 @@
     <Content Include="Views\Team\Edit.cshtml" />
     <Content Include="Views\Team\Index.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Player\Details.cshtml" />
+    <Content Include="Views\User\Details.cshtml" />
     <Content Include="Views\League\Details.cshtml" />
     <Content Include="Views\Account\Edit.cshtml" />
   </ItemGroup>
@@ -365,6 +369,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201311160015302_RatingAddScore.resx">
       <DependentUpon>201311160015302_RatingAddScore.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311160958249_PlayerToUserRefactor.resx">
+      <DependentUpon>201311160958249_PlayerToUserRefactor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
