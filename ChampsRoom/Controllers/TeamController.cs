@@ -55,7 +55,7 @@ namespace ChampsRoom.Controllers
         {
             var team = await db.Teams.Include(q => q.Players).Include(q => q.Leagues).Include(q => q.Players).FirstOrDefaultAsync(q => q.Url.Equals(teamUrl, StringComparison.InvariantCultureIgnoreCase));
 
-            if (team == null || !Helpers.TeamHelper.CanEditTeam(team))
+            if (team == null || !Helpers.DbHelper.CanEditTeam(team))
                 return HttpNotFound();
 
             return View(team);
@@ -69,13 +69,13 @@ namespace ChampsRoom.Controllers
         {
             var team = await db.Teams.Include(i => i.Players).FirstOrDefaultAsync(q => q.Id == model.Id);
 
-            if (team == null || !Helpers.TeamHelper.CanEditTeam(team))
+            if (team == null || !Helpers.DbHelper.CanEditTeam(team))
                 return HttpNotFound();
 
             if (!team.Name.Trim().Equals(model.Name.Trim(), StringComparison.InvariantCultureIgnoreCase))
             {
                 var name = model.Name.ToFriendlyUrl().ToString();
-                var teamExists = db.Teams.FirstOrDefault(q => q.Url.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+                var teamExists = await db.Teams.FirstOrDefaultAsync(q => q.Url.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
                 if (teamExists != null)
                     ModelState.AddModelError(String.Empty, "Team name is not available");
@@ -87,7 +87,7 @@ namespace ChampsRoom.Controllers
                 team.Url = model.Name.ToFriendlyUrl();
 
                 db.Entry(team).State = EntityState.Modified;
-                db.SaveChanges();
+                await db.SaveChangesAsync();
 
                 return RedirectToAction("Index");
             }

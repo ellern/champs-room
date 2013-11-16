@@ -197,14 +197,13 @@ namespace ChampsRoom.Controllers
             var homeWon = homeWins > awayWins;
             var awayWon = awayWins > homeWins;
             var draw = homeWins == awayWins;
-            var elo = new EloRating(avgHome, avgAway, homeWins, awayWins);
+            var elorating = EloRating.CalculateChange(avgHome, avgAway, homeWins, awayWins);
             var ratings = new List<Rating>();
 
             foreach (var player in homeTeam.Players)
             {
                 var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == player.Id);
-                var rating = latestRating == null ? 1000 : latestRating.Rate;
-                var ratingChange = Convert.ToInt32(elo.FinalResult1) - avgHome;
+                var ratingChange = homeWon ? System.Math.Abs(elorating) : System.Math.Abs(elorating) * -1;
 
                 ratings.Add(new Rating()
                 {
@@ -217,7 +216,7 @@ namespace ChampsRoom.Controllers
                     Rank = 0,
                     RankingChange = 0,
                     RankedLast = false,
-                    Rate = rating + ratingChange,
+                    Rate = (latestRating == null ? 1000 : latestRating.Rate) + ratingChange,
                     RatingChange = ratingChange,
                     Score = sets.Sum(q => q.HomeScore) - sets.Sum(q => q.AwayScore)
                 });
@@ -226,8 +225,7 @@ namespace ChampsRoom.Controllers
             foreach (var player in awayTeam.Players)
             {
                 var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == leagueId && q.Player.Id == player.Id);
-                var rating = latestRating == null ? 1000 : latestRating.Rate;
-                var ratingChange = Convert.ToInt32(elo.FinalResult2) - avgAway;        
+                var ratingChange = awayWon ? System.Math.Abs(elorating) : System.Math.Abs(elorating) * -1;
 
                 ratings.Add(new Rating()
                 {
@@ -240,7 +238,7 @@ namespace ChampsRoom.Controllers
                     Rank = 0,
                     RankingChange = 0,
                     RankedLast = false,
-                    Rate = rating + ratingChange,
+                    Rate = (latestRating == null ? 1000 : latestRating.Rate) + ratingChange,
                     RatingChange = ratingChange,
                     Score = sets.Sum(q => q.AwayScore) - sets.Sum(q => q.HomeScore)
                 });
@@ -266,7 +264,7 @@ namespace ChampsRoom.Controllers
 
             await db.SaveChangesAsync();
 
-            #region Update rank
+            #region Update ranking post match
 
             foreach (var player in homeTeam.Players)
             {

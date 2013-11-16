@@ -3,7 +3,7 @@
 <div class="row text-center">
     <h1>@Model.Name</h1>
     <p class="lead">
-        @if (ChampsRoom.Helpers.TeamHelper.CanEditTeam(Model))
+        @if (ChampsRoom.Helpers.DbHelper.CanEditTeam(Model))
         {
             <a href="@Url.Action("Edit", new { teamUrl = Model.Url })" class="btn btn-default btn-sm">Edit team</a>
         }

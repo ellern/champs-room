@@ -342,6 +342,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Player\Details.cshtml" />
     <Content Include="Views\League\Details.cshtml" />
+    <Content Include="Views\Account\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -10,7 +10,7 @@ using System.Web;
 
 namespace ChampsRoom.Helpers
 {
-    public class TeamHelper
+    public class DbHelper
     {
         static DataContext db = new DataContext();
 
@@ -26,6 +26,20 @@ namespace ChampsRoom.Helpers
                 return false;
 
             return true;
+        }
+
+        public static bool CanEditPlayer(Player player)
+        {
+            if (player == null || !HttpContext.Current.Request.IsAuthenticated)
+                return false;
+
+            var userId = HttpContext.Current.User.Identity.GetUserId();
+            var user = db.Users.Include(i => i.Player).FirstOrDefault(q => q.Id == userId);
+
+            if (player.Id == user.Player.Id)
+                return true;
+
+            return false;
         }
     }
 }

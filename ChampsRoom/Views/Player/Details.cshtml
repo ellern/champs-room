@@ -3,6 +3,10 @@
 <div class="row text-center">
     <h1>@Model.Name</h1>
     <p class="lead">
+        @if (ChampsRoom.Helpers.DbHelper.CanEditPlayer(Model))
+        {
+            <a href="@Url.Action("Edit", new { playerUrl = Model.Url })" class="btn btn-default btn-sm">Edit player</a>
+        }
         <ul class="list-inline">
             <li>Ranked in:</li>
             @foreach (var item in Model.Leagues)

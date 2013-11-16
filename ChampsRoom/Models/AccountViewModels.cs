@@ -60,4 +60,14 @@ namespace ChampsRoom.Models
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
     }
+
+    public class EditViewModel
+    {
+        [Required]
+        [Display(Name = "Username")]
+        public string UserName { get; set; }
+
+        [Display(Name = "Image URL")]
+        public string ImageUrl { get; set; }
+    }
 }

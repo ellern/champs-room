@@ -11,6 +11,7 @@ using Microsoft.Owin.Security;
 using ChampsRoom.Helpers;
 using ChampsRoom.Models;
 using Newtonsoft.Json;
+using System.Data.Entity;
 
 namespace ChampsRoom.Controllers
 {
@@ -32,8 +33,6 @@ namespace ChampsRoom.Controllers
 
         public UserManager<User> UserManager { get; private set; }
 
-        //
-        // GET: /Account/Login
         [AllowAnonymous]
         [Route("login")]
         public ActionResult Login(string returnUrl)
@@ -42,8 +41,6 @@ namespace ChampsRoom.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -68,8 +65,6 @@ namespace ChampsRoom.Controllers
             return View(model);
         }
 
-        //
-        // GET: /Account/Register
         [AllowAnonymous]
         [Route("register")]
         public ActionResult Register()
@@ -77,14 +72,15 @@ namespace ChampsRoom.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         [Route("register")]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            if (!await IsNameAvailable(model.UserName))
+                ModelState.AddModelError(String.Empty, "Name is not available");
+
             if (ModelState.IsValid)
             {
                 var user = new User() { UserName = model.UserName };
@@ -107,8 +103,56 @@ namespace ChampsRoom.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Account/Disassociate
+        [Route("edit")]
+        public async Task<ActionResult> Edit()
+        {
+            var userid = User.Identity.GetUserId();
+            var user = await db.Users.FirstOrDefaultAsync(q => q.Id == userid);
+
+            if (user == null)
+                return HttpNotFound();
+
+            var viewmodel = new EditViewModel()
+            {
+                ImageUrl = user.ImageUrl,
+                UserName = user.UserName
+            };
+
+            return View(viewmodel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("edit")]
+        public async Task<ActionResult> Edit(EditViewModel model)
+        {
+            var userid = User.Identity.GetUserId();
+            var user = await db.Users.Include(i => i.Player).FirstOrDefaultAsync(q => q.Id == userid);
+
+            if (user == null || user.Player == null)
+                return HttpNotFound();
+
+            if (!await IsNameAvailable(model.UserName, user.Player.Name))
+                ModelState.AddModelError(String.Empty, "Name is not available");
+
+            if (ModelState.IsValid)
+            {
+                user.ImageUrl = model.ImageUrl;
+                user.UserName = model.UserName;
+
+                user.Player.Name = model.UserName;
+                user.Player.Url = model.UserName.ToFriendlyUrl();
+
+                db.Entry(user).State = EntityState.Modified;
+
+                await db.SaveChangesAsync();
+
+                return RedirectToAction("Manage");
+            }
+
+            return View(model);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Disassociate(string loginProvider, string providerKey)
@@ -126,8 +170,6 @@ namespace ChampsRoom.Controllers
             return RedirectToAction("Manage", new { Message = message });
         }
 
-        //
-        // GET: /Account/Manage
         public ActionResult Manage(ManageMessageId? message)
         {
             ViewBag.StatusMessage =
@@ -145,8 +187,6 @@ namespace ChampsRoom.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Manage
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Manage(ManageUserViewModel model)
@@ -199,8 +239,6 @@ namespace ChampsRoom.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -210,11 +248,6 @@ namespace ChampsRoom.Controllers
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
-
-
-
-        //
-        // GET: /Account/ExternalLoginCallback
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
@@ -260,8 +293,6 @@ namespace ChampsRoom.Controllers
             }
         }
 
-        //
-        // POST: /Account/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LinkLogin(string provider)
@@ -270,8 +301,6 @@ namespace ChampsRoom.Controllers
             return new ChallengeResult(provider, Url.Action("LinkLoginCallback", "Account"), User.Identity.GetUserId());
         }
 
-        //
-        // GET: /Account/LinkLoginCallback
         public async Task<ActionResult> LinkLoginCallback()
         {
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(XsrfKey, User.Identity.GetUserId());
@@ -287,8 +316,6 @@ namespace ChampsRoom.Controllers
             return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
         }
 
-        //
-        // POST: /Account/ExternalLoginConfirmation
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -328,8 +355,6 @@ namespace ChampsRoom.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
@@ -338,8 +363,6 @@ namespace ChampsRoom.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //
-        // GET: /Account/ExternalLoginFailure
         [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
         {
@@ -456,6 +479,35 @@ namespace ChampsRoom.Controllers
         }
         #endregion
 
+        private async Task<bool> IsNameAvailable(string name, string currentName = "")
+        {
+            var notAllowed = new string[] {
+                                 "account",
+                                 "result",
+                                 "results",
+                                 "league",
+                                 "leagues",
+                                 "team",
+                                 "teams",
+                                 "player",
+                                 "players",
+                                 "admin",
+                                 "home"
+                             };
+
+            var friendlyName = name.ToFriendlyUrl();
+
+            if (friendlyName.Equals(currentName.ToFriendlyUrl()))
+                return true;
+
+            if (notAllowed.Count(q => q.Equals(name, StringComparison.InvariantCultureIgnoreCase)) > 0)
+                return false;
+
+            var count = await db.Players.CountAsync(q => q.Url.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+
+            return count == 0;
+        }
 
         private async Task AttachPlayerAsync(string userId)
         {
