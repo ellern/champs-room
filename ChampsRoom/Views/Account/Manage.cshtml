@@ -1,11 +1,12 @@
-﻿@using ChampsRoom.Models;
+﻿@model ChampsRoom.Models.User
+@using ChampsRoom.Models;
 @using Microsoft.AspNet.Identity;
 
 <div class="row">
     <div class="col-xs-12 col-md-12">
         <div class="media">
             <a class="pull-left" href="#">
-                <img class="media-object img-circle img-profile img-profile-large" src="@User.Identity.GetImageUrl()" alt="">
+                <img class="media-object img-rounded img-profile img-profile-large" src="@User.Identity.GetImageUrl()" alt="">
             </a>
             <div class="media-body">
                 <h4 class="media-heading">@User.Identity.GetUserName()</h4>

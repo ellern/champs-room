@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
@@ -21,13 +22,18 @@ namespace ChampsRoom.Models
         {
             get
             {
-
                 var matches = new List<Match>();
-                matches.AddRange(this.AwayMatches);
-                matches.AddRange(this.HomeMatches);
+                if (this.AwayMatches != null && this.AwayMatches.Count > 0)
+                    matches.AddRange(this.AwayMatches);
+                if (this.HomeMatches != null && this.HomeMatches.Count > 0)
+                    matches.AddRange(this.HomeMatches);
 
                 return matches;
             }
+        }
+        public string GetImageUrl()
+        {
+            return String.IsNullOrWhiteSpace(this.ImageUrl) ? "http://placehold.it/400x400&text=No+image" : this.ImageUrl;
         }
     }
 
@@ -100,7 +106,7 @@ namespace ChampsRoom.Models
                     map.MapRightKey("MatchId");
                     map.ToTable("MatchesHomeUsers");
                 });
-           
+
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -61,7 +61,7 @@ namespace ChampsRoom.Models
         public string ConfirmPassword { get; set; }
     }
 
-    public class EditViewModel
+    public class UserEditViewModel
     {
         [Required]
         [Display(Name = "Username")]

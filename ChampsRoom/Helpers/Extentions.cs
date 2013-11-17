@@ -20,15 +20,10 @@ namespace ChampsRoom.Helpers
 
             ClaimsIdentity claimsIdentity = identity as ClaimsIdentity;
 
-            if (claimsIdentity != null)
-            {
-                var imageUrl = claimsIdentity.FindFirstValue("ImageUrl");
+            if (claimsIdentity == null)
+                return null;
 
-                if (!String.IsNullOrWhiteSpace(imageUrl))
-                    return imageUrl;
-            }
-
-            return "http://placehold.it/400x400&text=No+image";
+            return claimsIdentity.FindFirstValue("ImageUrl");
         }
     }
 

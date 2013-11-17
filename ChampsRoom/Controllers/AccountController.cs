@@ -110,7 +110,7 @@ namespace ChampsRoom.Controllers
             if (user == null)
                 return HttpNotFound();
 
-            var viewmodel = new EditViewModel()
+            var viewmodel = new UserEditViewModel()
             {
                 ImageUrl = user.ImageUrl,
                 UserName = user.UserName
@@ -122,7 +122,7 @@ namespace ChampsRoom.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("edit")]
-        public async Task<ActionResult> Edit(EditViewModel model)
+        public async Task<ActionResult> Edit(UserEditViewModel model)
         {
             var userid = User.Identity.GetUserId();
             var user = await db.Users.FirstOrDefaultAsync(q => q.Id == userid);
@@ -137,12 +137,12 @@ namespace ChampsRoom.Controllers
             {
                 user.ImageUrl = model.ImageUrl;
                 user.UserName = model.UserName;
-                user.UserName = model.UserName;
                 user.Url = model.UserName.ToFriendlyUrl();
 
                 db.Entry(user).State = EntityState.Modified;
 
                 await db.SaveChangesAsync();
+                await SignInAsync(user, isPersistent: false);
 
                 return RedirectToAction("Manage");
             }
@@ -396,8 +396,7 @@ namespace ChampsRoom.Controllers
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             var identity = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
 
-            if (!String.IsNullOrWhiteSpace(user.ImageUrl))
-                identity.AddClaim(new Claim("ImageUrl", user.ImageUrl));
+            identity.AddClaim(new Claim("ImageUrl", user.GetImageUrl()));
 
             AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
         }

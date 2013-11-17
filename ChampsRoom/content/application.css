@@ -7,7 +7,7 @@
 }
 
 .img-profile {
-    border: 5px solid #eee;
+    border: 2px solid #eee;
     transition: all 0.2s ease-in-out;
 }
 
@@ -15,9 +15,17 @@
         border: 1px solid #eee;
     }
 
-.img-profile-large {
-    width: 80px;
-}
+    .img-profile.img-profile-xs {
+        width: 32px;
+    }
+
+    .img-profile.img-profile-md {
+        width: 52px;
+    }
+
+    .img-profile.img-profile-large {
+        width: 80px;
+    }
 
 .table-clickable > tbody > tr:hover {
     cursor: pointer;
