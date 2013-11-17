@@ -1,13 +1,11 @@
-﻿using ChampsRoom.Models;
-using ChampsRoom.Helpers;
-using Microsoft.AspNet.Identity;
+﻿using ChampsRoom.Helpers;
+using ChampsRoom.Models;
+using ChampsRoom.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Web.Mvc;
 using System.Threading.Tasks;
-using ChampsRoom.ViewModels;
+using System.Web.Mvc;
 
 namespace ChampsRoom.Controllers
 {

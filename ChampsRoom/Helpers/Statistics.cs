@@ -1,17 +1,15 @@
 ﻿using ChampsRoom.Models;
-using ChampsRoom.Helpers;
+using ChampsRoom.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
-using ChampsRoom.ViewModels;
 
 namespace ChampsRoom.Helpers
 {
-    public class Stats
+    public class Statistics
     {
-        static DataContext db = new DataContext();
+        static readonly DataContext db = new DataContext();
 
         public static int GetRank(Guid leagueId, string userId)
         {

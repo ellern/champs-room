@@ -1,14 +1,13 @@
 ﻿using ChampsRoom.Helpers;
 using ChampsRoom.Models;
+using ChampsRoom.ViewModels;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using ChampsRoom.ViewModels;
 
 namespace ChampsRoom.Controllers
 {
@@ -30,7 +29,7 @@ namespace ChampsRoom.Controllers
                 .Include(i => i.HomeMatches.Select(y => y.AwayUsers))
                 .Include(i => i.HomeMatches.Select(y => y.HomeUsers))
                 .FirstOrDefaultAsync(q => q.Slug.Equals(slugUser, StringComparison.InvariantCultureIgnoreCase));
-                               
+
             if (user == null)
                 return HttpNotFound();
 
@@ -90,20 +89,22 @@ namespace ChampsRoom.Controllers
 
             var userFound = false;
 
-            foreach (var item in homeUsers)
-                if (!userFound)
-                    userFound = item.Id == userId;
+            foreach (var item in homeUsers.Where(item => !userFound))
+                userFound = item.Id == userId;
 
-            foreach (var item in awayUsers)
-                if (!userFound)
-                    userFound = item.Id == userId;
+            foreach (var item in awayUsers.Where(item => !userFound))
+                userFound = item.Id == userId;
 
             if (!userFound)
                 return HttpNotFound();
 
             var allTeams = db.Teams.Include(i => i.Users);
-            var homeTeam = allTeams.Where(p => !p.Users.Select(c => c.Id).Except(home).Union(home.Except(p.Users.Select(c => c.Id))).Any()).FirstOrDefault();
-            var awayTeam = allTeams.Where(p => !p.Users.Select(c => c.Id).Except(away).Union(away.Except(p.Users.Select(c => c.Id))).Any()).FirstOrDefault();
+
+            var homeTeam = allTeams.FirstOrDefault(p => !p.Users.Select(u => u.Id).Except(home).Union(home.Except(p.Users.Select(u => u.Id))).Any());
+            var awayTeam = allTeams.FirstOrDefault(p => !p.Users.Select(u => u.Id).Except(away).Union(away.Except(p.Users.Select(u => u.Id))).Any());
+
+            //var homeTeam = allTeams.Where(p => !p.Users.Select(c => c.Id).Except(home).Union(home.Except(p.Users.Select(c => c.Id))).Any()).FirstOrDefault();
+            //var awayTeam = allTeams.Where(p => !p.Users.Select(c => c.Id).Except(away).Union(away.Except(p.Users.Select(c => c.Id))).Any()).FirstOrDefault();
 
             if (homeTeam == null)
             {
@@ -131,13 +132,11 @@ namespace ChampsRoom.Controllers
                 db.Teams.Add(awayTeam);
             }
 
-            foreach (var item in awayTeam.Users)
-                if (!league.Users.Contains(item))
-                    league.Users.Add(item);
+            foreach (var item in awayTeam.Users.Where(item => !league.Users.Contains(item)))
+                league.Users.Add(item);
 
-            foreach (var item in homeTeam.Users)
-                if (!league.Users.Contains(item))
-                    league.Users.Add(item);
+            foreach (var item in homeTeam.Users.Where(item => !league.Users.Contains(item)))
+                league.Users.Add(item);
 
             if (!league.Teams.Contains(awayTeam))
                 league.Teams.Add(awayTeam);
@@ -257,7 +256,7 @@ namespace ChampsRoom.Controllers
 
             foreach (var item in homeTeam.Users)
             {
-                var rank = Stats.GetRank(league.Id, item.Id);
+                var rank = Statistics.GetRank(league.Id, item.Id);
                 var rating = ratings.FirstOrDefault(q => q.UserId == item.Id);
                 rating.Rank = rank;
                 rating.RankingChange = ratingHome.FirstOrDefault(q => q.Item1 == item.Id).Item3 - rank;
@@ -267,7 +266,7 @@ namespace ChampsRoom.Controllers
 
             foreach (var item in awayTeam.Users)
             {
-                var rank = Stats.GetRank(league.Id, item.Id);
+                var rank = Statistics.GetRank(league.Id, item.Id);
                 var rating = ratings.FirstOrDefault(q => q.UserId == item.Id);
                 rating.Rank = rank;
                 rating.RankingChange = ratingAway.FirstOrDefault(q => q.Item1 == item.Id).Item3 - rank;
@@ -281,5 +280,5 @@ namespace ChampsRoom.Controllers
 
             return RedirectToAction("Details", "League", new { slug = league.Slug });
         }
-	}
+    }
 }

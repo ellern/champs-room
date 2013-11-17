@@ -1,18 +1,13 @@
 ﻿using ChampsRoom.Models;
 using Microsoft.AspNet.Identity;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Web.Mvc;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace ChampsRoom.Helpers
 {
     public class DbHelper
     {
-        static DataContext db = new DataContext();
+        static readonly DataContext db = new DataContext();
 
         public static bool CanEditTeam(Team team)
         {

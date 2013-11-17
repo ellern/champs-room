@@ -36,30 +36,12 @@ namespace ChampsRoom.Models
 
         public int GetHomeSetScore()
         {
-            var score = 0;
-
-            if (this.Sets == null)
-                return score;
-
-            foreach (var item in this.Sets)
-                if (item.HomeScore > item.AwayScore)
-                    score++;
-
-            return score;
+            return this.Sets == null ? 0 : this.Sets.Count(item => item.HomeScore > item.AwayScore);
         }
 
         public int GetAwaySetScore()
         {
-            var score = 0;
-
-            if (this.Sets == null)
-                return score;
-
-            foreach (var item in this.Sets)
-                if (item.AwayScore > item.HomeScore)
-                    score++;
-
-            return score;
+            return this.Sets == null ? 0 : this.Sets.Count(item => item.AwayScore > item.HomeScore);
         }
 
         public HtmlString GetSetScoresTooltip()

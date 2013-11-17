@@ -1,12 +1,12 @@
-﻿using ChampsRoom.Models;
-using ChampsRoom.Helpers;
+﻿using ChampsRoom.Helpers;
+using ChampsRoom.Models;
+using ChampsRoom.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Web.Mvc;
 using System.Threading.Tasks;
-using ChampsRoom.ViewModels;
+using System.Web.Mvc;
 
 namespace ChampsRoom.Controllers
 {
@@ -58,9 +58,9 @@ namespace ChampsRoom.Controllers
                 var ratingsViewModel = new RatingsViewModel()
                 {
                     Matches = userRatings.Count(),
-                    Draw = userRatings.Count(q => q.Draw == true),
-                    Lost = userRatings.Count(q => q.Lost == true),
-                    Won = userRatings.Count(q => q.Won == true),
+                    Draw = userRatings.Count(q => q.Draw),
+                    Lost = userRatings.Count(q => q.Lost),
+                    Won = userRatings.Count(q => q.Won),
                     Rank = userLatestRating == null ? 0 : userLatestRating.Rank,
                     RankingChange = userLatestRating == null ? 0 : userLatestRating.RankingChange,
                     Rate = userLatestRating == null ? 1000 : userLatestRating.Rate,

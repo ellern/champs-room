@@ -201,9 +201,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\EloRating.cs" />
-    <Compile Include="Helpers\Extentions.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\Helpers.cs" />
-    <Compile Include="Helpers\Stats.cs" />
+    <Compile Include="Helpers\Statistics.cs" />
     <Compile Include="Migrations\201311151506104_InitialCreate.cs" />
     <Compile Include="Migrations\201311151506104_InitialCreate.Designer.cs">
       <DependentUpon>201311151506104_InitialCreate.cs</DependentUpon>
@@ -249,6 +249,16 @@
     <Compile Include="ViewModels\ResultCreateViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="apple-touch-icon-114x114.png" />
+    <Content Include="apple-touch-icon-120x120.png" />
+    <Content Include="apple-touch-icon-144x144.png" />
+    <Content Include="apple-touch-icon-152x152.png" />
+    <Content Include="apple-touch-icon-57x57.png" />
+    <Content Include="apple-touch-icon-60x60.png" />
+    <Content Include="apple-touch-icon-72x72.png" />
+    <Content Include="apple-touch-icon-76x76.png" />
+    <Content Include="apple-touch-icon-precomposed.png" />
+    <Content Include="apple-touch-icon.png" />
     <Content Include="content\bootstrap-theme.css" />
     <Content Include="content\bootstrap-theme.min.css" />
     <Content Include="content\bootstrap.css" />
@@ -262,7 +272,12 @@
     <Content Include="content\images\rank-first.gif" />
     <Content Include="content\images\rank-last.gif" />
     <Content Include="content\images\rank-second.gif" />
+    <Content Include="favicon-160x160.png" />
+    <Content Include="favicon-16x16.png" />
+    <Content Include="favicon-32x32.png" />
+    <Content Include="favicon-96x96.png" />
     <Content Include="favicon.ico" />
+    <Content Include="favicon.png" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -270,6 +285,11 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="mstile-144x144.png" />
+    <Content Include="mstile-150x150.png" />
+    <Content Include="mstile-310x150.png" />
+    <Content Include="mstile-310x310.png" />
+    <Content Include="mstile-70x70.png" />
     <Content Include="scripts\bootstrap.js" />
     <Content Include="scripts\bootstrap.min.js" />
     <Content Include="fonts\fontawesome-webfont.woff" />
