@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using ChampsRoom.ViewModels;
 
 namespace ChampsRoom.Helpers
 {
@@ -29,14 +30,14 @@ namespace ChampsRoom.Helpers
             if (league == null)
                 return 0;
 
-            var rankings = new List<RankingViewModel>();
+            var rankings = new List<RatingsViewModel>();
 
             foreach (var item in league.Users.Distinct())
             {
                 var userRatings = ratings.Where(q => q.UserId == item.Id);
                 var latestRating = userRatings.FirstOrDefault();
 
-                var ranking = new RankingViewModel()
+                var ranking = new RatingsViewModel()
                 {
                     Draw = userRatings.Count(q => q.Draw == true),
                     Lost = userRatings.Count(q => q.Lost == true),

@@ -1,4 +1,4 @@
-﻿@model ChampsRoom.Models.MatchCreateViewModel
+﻿@model ChampsRoom.ViewModels.ResultCreateViewModel
 @using Microsoft.AspNet.Identity
 
     <div class="row text-center">
@@ -62,7 +62,7 @@
                 <p class="text-center visible-xs">
                     <button type="submit" class="btn btn-success btn-lg btn-block btn-submit">Save result</button>
                 </p>
-                <p><a href="@Url.Action("Details", "League", new { id = Model.League.Url })">Cancel</a></p>
+                <p><a href="@Url.Action("Details", "League", new { slug = Model.League.Slug })">Cancel</a></p>
             </div>
         </div>
 

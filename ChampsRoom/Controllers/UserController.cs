@@ -16,13 +16,13 @@ namespace ChampsRoom.Controllers
     {
         DataContext db = new DataContext();
 
-        [Route("{userUrl}")]
-        public async Task<ActionResult> Details(string userUrl)
+        [Route("{slug}")]
+        public async Task<ActionResult> Details(string slug)
         {
             var user = await db.Users
                 .Include(i => i.Leagues)
                 .Include(i => i.Teams.Select(p => p.Users))
-                .FirstOrDefaultAsync(q => q.Url.Equals(userUrl, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
 
             return View(user);
         }

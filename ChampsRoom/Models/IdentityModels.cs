@@ -11,7 +11,7 @@ namespace ChampsRoom.Models
     public class User : IdentityUser
     {
         public string ImageUrl { get; set; }
-        public string Url { get; set; }
+        public string Slug { get; set; }
 
         public ICollection<League> Leagues { get; set; }
         public ICollection<Match> AwayMatches { get; set; }

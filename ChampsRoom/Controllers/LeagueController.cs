@@ -6,6 +6,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
 using System.Threading.Tasks;
+using ChampsRoom.ViewModels;
 
 namespace ChampsRoom.Controllers
 {
@@ -20,15 +21,15 @@ namespace ChampsRoom.Controllers
             var result = await db.Leagues.OrderBy(q => q.Name).ToListAsync();
 
             if (result.Count == 1)
-                return RedirectToAction("Details", new { id = result.FirstOrDefault().Url });
+                return RedirectToAction("Details", new { slug = result.FirstOrDefault().Slug });
 
             return View(result);
         }
 
-        [Route("{id}")]
-        public async Task<ActionResult> Details(string id)
+        [Route("{slug}")]
+        public async Task<ActionResult> Details(string slug)
         {
-            var league = await db.Leagues.FirstOrDefaultAsync(q => q.Url.Equals(id, StringComparison.InvariantCultureIgnoreCase));
+            var league = await db.Leagues.FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
 
             if (league == null)
                 return HttpNotFound();
@@ -47,36 +48,36 @@ namespace ChampsRoom.Controllers
                 .Include(i => i.HomeTeam)
                 .OrderByDescending(q => q.Created).ToListAsync();
 
-            var rankings = new List<RankingViewModel>();
+            var ratingViewModels = new List<RatingsViewModel>();
 
             foreach (var user in ratings.Select(q => q.User).Distinct())
             {
                 var userRatings = ratings.Where(q => q.UserId == user.Id);
                 var userLatestRating = userRatings.FirstOrDefault();
 
-                var ranking = new RankingViewModel()
+                var ratingsViewModel = new RatingsViewModel()
                 {
+                    Matches = userRatings.Count(),
                     Draw = userRatings.Count(q => q.Draw == true),
                     Lost = userRatings.Count(q => q.Lost == true),
                     Won = userRatings.Count(q => q.Won == true),
-                    Matches = userRatings.Count(),
-                    User = user,
                     Rank = userLatestRating == null ? 0 : userLatestRating.Rank,
                     RankingChange = userLatestRating == null ? 0 : userLatestRating.RankingChange,
                     Rate = userLatestRating == null ? 1000 : userLatestRating.Rate,
                     RatingChange = userLatestRating == null ? 0 : userLatestRating.RatingChange,
                     Score = userRatings.Sum(q => q.Score),
-                    Team = null
+                    Team = null,
+                    User = user                    
                 };
 
-                rankings.Add(ranking);
+                ratingViewModels.Add(ratingsViewModel);
             }
 
             var viewmodel = new LeagueDetailsViewModel()
             {
                 LatestMatches = latestMatches,
                 League = league,
-                Rankings = rankings
+                Ratings = ratingViewModels
                     .OrderByDescending(q => q.Rate)
                     .ThenByDescending(q => q.Won)
                     .ThenByDescending(q => q.Draw)
@@ -87,7 +88,7 @@ namespace ChampsRoom.Controllers
 
             var rank = 0;
 
-            foreach (var item in viewmodel.Rankings)
+            foreach (var item in viewmodel.Ratings)
                 item.Rank = ++rank;
 
             return View(viewmodel);
@@ -103,7 +104,7 @@ namespace ChampsRoom.Controllers
         {
             if (ModelState.IsValid)
             {
-                league.Url = league.Name.ToFriendlyUrl();
+                league.Slug = league.Name.ToFriendlyUrl();
 
                 db.Leagues.Add(league);
                 await db.SaveChangesAsync();
@@ -129,7 +130,7 @@ namespace ChampsRoom.Controllers
         {
             if (ModelState.IsValid)
             {
-                league.Url = league.Name.ToFriendlyUrl();
+                league.Slug = league.Name.ToFriendlyUrl();
 
                 db.Entry(league).State = EntityState.Modified;
                 await db.SaveChangesAsync();

@@ -83,7 +83,7 @@ namespace ChampsRoom.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = new User() { UserName = model.UserName, Url = model.UserName.ToFriendlyUrl() };
+                var user = new User() { UserName = model.UserName, Slug = model.UserName.ToFriendlyUrl() };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -137,7 +137,7 @@ namespace ChampsRoom.Controllers
             {
                 user.ImageUrl = model.ImageUrl;
                 user.UserName = model.UserName;
-                user.Url = model.UserName.ToFriendlyUrl();
+                user.Slug = model.UserName.ToFriendlyUrl();
 
                 db.Entry(user).State = EntityState.Modified;
 
@@ -167,7 +167,7 @@ namespace ChampsRoom.Controllers
             return RedirectToAction("Manage", new { Message = message });
         }
 
-        public ActionResult Manage(ManageMessageId? message)
+        public async Task<ActionResult> Manage(ManageMessageId? message)
         {
             ViewBag.StatusMessage =
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
@@ -177,6 +177,14 @@ namespace ChampsRoom.Controllers
                 : "";
             ViewBag.HasLocalPassword = HasPassword();
             ViewBag.ReturnUrl = Url.Action("Manage");
+
+            var userid = User.Identity.GetUserId();
+
+            ViewBag.Leagues = await db.Users
+                .Include(i => i.Leagues)
+                .Where(q => q.Id == userid)
+                .SelectMany(s => s.Leagues)
+                .ToListAsync();
 
             return View();
         }
@@ -263,7 +271,7 @@ namespace ChampsRoom.Controllers
             {
                 if (!String.IsNullOrWhiteSpace(loginInfo.DefaultUserName))
                 {
-                    user = new User() { UserName = loginInfo.DefaultUserName, Url = loginInfo.DefaultUserName.ToFriendlyUrl() };
+                    user = new User() { UserName = loginInfo.DefaultUserName, Slug = loginInfo.DefaultUserName.ToFriendlyUrl() };
                     var result = await UserManager.CreateAsync(user);
                     if (result.Succeeded)
                     {
@@ -327,7 +335,7 @@ namespace ChampsRoom.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new User() { UserName = model.UserName, Url = model.UserName.ToFriendlyUrl() };
+                var user = new User() { UserName = model.UserName, Slug = model.UserName.ToFriendlyUrl() };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -471,6 +479,9 @@ namespace ChampsRoom.Controllers
 
         private async Task<bool> IsNameAvailable(string name, string currentName = "")
         {
+            if (String.IsNullOrWhiteSpace(name))
+                return false;
+
             var notAllowed = new string[] {
                                  "account",
                                  "result",
@@ -490,7 +501,19 @@ namespace ChampsRoom.Controllers
                                  "details",
                                  "delete",
                                  "put",
+                                 "get",
                                  "post",
+                                 "script",
+                                 "scripts",
+                                 "views",
+                                 "content",
+                                 "contents",
+                                 "image",
+                                 "images",
+                                 "url",
+                                 "slug",
+                                 "css",
+                                 "js",
                                  "home"
                              };
 
@@ -502,7 +525,7 @@ namespace ChampsRoom.Controllers
             if (notAllowed.Count(q => q.Equals(name, StringComparison.InvariantCultureIgnoreCase)) > 0)
                 return false;
 
-            var count = await db.Users.CountAsync(q => q.Url.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            var count = await db.Users.CountAsync(q => q.Slug.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
 
             return count == 0;

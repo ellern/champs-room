@@ -1,4 +1,4 @@
-﻿@model ChampsRoom.Models.LeagueMatchesViewModel
+﻿@model ChampsRoom.ViewModels.ResultDetailsViewModel
 @{
     var chartRanking = "";
     var chartRating = "";
@@ -13,7 +13,7 @@
 
 <div class="row text-center">
     <h1>@Model.User.UserName</h1>
-    <p class="lead">All matches played in @Html.ActionLink(Model.League.Name, "Details", "League", new { id = Model.League.Url }, null)</p>
+    <p class="lead">All matches played in @Html.ActionLink(Model.League.Name, "Details", "League", new { slug = Model.League.Slug }, null)</p>
 </div>
 
 <div class="row">
@@ -55,7 +55,7 @@
                         <ul class="list-inline">
                             @foreach (var opponent in item.Opponent(Model.User))
                             {
-                                <li><a href="@Url.Action("Details", new { leagueUrl = Model.League.Url, playerUrl = opponent.Url })">@opponent.UserName</a></li>
+                                <li><a href="@Url.Action("Details", new { slug = Model.League.Slug, slugUser = opponent.Slug })">@opponent.UserName</a></li>
                             }
                         </ul>
                     </td>

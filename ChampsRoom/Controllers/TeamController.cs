@@ -7,6 +7,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
 using System.Threading.Tasks;
+using ChampsRoom.ViewModels;
 
 namespace ChampsRoom.Controllers
 {
@@ -23,7 +24,7 @@ namespace ChampsRoom.Controllers
                 .Include(i => i.Leagues)
                 .ToListAsync();
 
-            var viewmodel = new OverviewTeamUsersViewModel()
+            var viewmodel = new TeamsIndexViewModel()
             {
                 League = null,
                 Teams = teams.Where(q => q.Users.Count > 1).ToList(),
@@ -33,13 +34,13 @@ namespace ChampsRoom.Controllers
             return View(viewmodel);
         }
 
-        [Route("{teamUrl}")]
-        public async Task<ActionResult> Details(string teamUrl)
+        [Route("{slug}")]
+        public async Task<ActionResult> Details(string slug)
         {
             var team = await db.Teams
                 .Include(i => i.Users)
                 .Include(i => i.Leagues)
-                .FirstOrDefaultAsync(q => q.Url.Equals(teamUrl, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
 
             if (team == null)
                 return HttpNotFound();
@@ -48,10 +49,10 @@ namespace ChampsRoom.Controllers
         }
 
         [Authorize]
-        [Route("{teamUrl}/edit")]
-        public async Task<ActionResult> Edit(string teamUrl)
+        [Route("{slug}/edit")]
+        public async Task<ActionResult> Edit(string slug)
         {
-            var team = await db.Teams.Include(q => q.Users).Include(q => q.Leagues).Include(q => q.Users).FirstOrDefaultAsync(q => q.Url.Equals(teamUrl, StringComparison.InvariantCultureIgnoreCase));
+            var team = await db.Teams.Include(q => q.Users).Include(q => q.Leagues).Include(q => q.Users).FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
 
             if (team == null || !Helpers.DbHelper.CanEditTeam(team))
                 return HttpNotFound();
@@ -62,8 +63,8 @@ namespace ChampsRoom.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("{teamUrl}/edit")]
-        public async Task<ActionResult> Edit(string teamUrl, Team model)
+        [Route("{slug}/edit")]
+        public async Task<ActionResult> Edit(string slug, Team model)
         {
             var team = await db.Teams.Include(i => i.Users).FirstOrDefaultAsync(q => q.Id == model.Id);
 
@@ -73,7 +74,7 @@ namespace ChampsRoom.Controllers
             if (!team.Name.Trim().Equals(model.Name.Trim(), StringComparison.InvariantCultureIgnoreCase))
             {
                 var name = model.Name.ToFriendlyUrl().ToString();
-                var teamExists = await db.Teams.FirstOrDefaultAsync(q => q.Url.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+                var teamExists = await db.Teams.FirstOrDefaultAsync(q => q.Slug.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
                 if (teamExists != null)
                     ModelState.AddModelError(String.Empty, "Team name is not available");
@@ -82,7 +83,7 @@ namespace ChampsRoom.Controllers
             if (ModelState.IsValid)
             {
                 team.Name = model.Name.Trim();
-                team.Url = model.Name.ToFriendlyUrl();
+                team.Slug = model.Name.ToFriendlyUrl();
 
                 db.Entry(team).State = EntityState.Modified;
                 await db.SaveChangesAsync();

@@ -1,41 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
 namespace ChampsRoom.Models
 {
-    public class League
-    {
-        public League()
-        {
-            this.Id = System.Guid.NewGuid();
-            this.Sets = 7;
-            this.SetsNeededToWin = 4;
-            this.MaxScore = 9999;
-            this.MinScore = 0;
-
-            this.Matches = new HashSet<Match>();
-            this.Users = new HashSet<User>();
-            this.Teams = new HashSet<Team>();
-        }
-
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Url { get; set; }
-        public int Sets { get; set; }
-        public int SetsNeededToWin { get; set; }
-        public int MaxScore { get; set; }
-        public int MinScore { get; set; }
-        public string Rules { get; set; }
-
-        public ICollection<Match> Matches { get; set; }
-        public ICollection<User> Users { get; set; }
-        public ICollection<Team> Teams { get; set; }
-    }
-
     public class Match
     {
         public Match()
@@ -156,74 +125,5 @@ namespace ChampsRoom.Models
 
             return false;
         }
-    }
-
-    public class Rating
-    {
-        public Rating()
-        {
-            this.Id = System.Guid.NewGuid();
-            this.Created = DateTime.Now;
-        }
-
-        public Guid Id { get; set; }
-        public DateTime Created { get; set; }
-        public bool Won { get; set; }
-        public bool Lost { get; set; }
-        public bool Draw { get; set; }
-        public int Rate { get; set; }
-        public int RatingChange { get; set; }
-        public int Rank { get; set; }
-        public int RankingChange { get; set; }
-        public int Score { get; set; }
-        public bool RankedLast { get; set; }
-        public Guid LeagueId { get; set; }
-        public League League { get; set; }
-        public Guid MatchId { get; set; }
-        public Match Match { get; set; }
-        public string UserId { get; set; }
-        public User User { get; set; }
-        public Guid TeamId { get; set; }
-        public Team Team { get; set; }
-    }
-
-    public class Set
-    {
-        public Set()
-        {
-            this.Id = System.Guid.NewGuid();
-            this.AwayScore = 0;
-            this.HomeScore = 0;
-        }
-
-        public Guid Id { get; set; }
-        public int HomeScore { get; set; }
-        public int AwayScore { get; set; }
-        public Guid MatchId { get; set; }
-        public Match Match { get; set; }
-    }
-
-    public class Team
-    {
-        public Team()
-        {
-            this.Id = System.Guid.NewGuid();
-            this.Users = new HashSet<User>();
-            this.Ratings = new HashSet<Rating>();
-            this.Leagues = new HashSet<League>();
-            this.AwayMatches = new HashSet<Match>();
-            this.HomeMatches = new HashSet<Match>();
-        }
-
-        public Guid Id { get; set; }
-        [Required]
-        public string Name { get; set; }
-        public string Url { get; set; }
-
-        public ICollection<User> Users { get; set; }
-        public ICollection<Rating> Ratings { get; set; }
-        public ICollection<League> Leagues { get; set; }
-        public ICollection<Match> AwayMatches { get; set; }
-        public ICollection<Match> HomeMatches { get; set; }
     }
 }

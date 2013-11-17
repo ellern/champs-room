@@ -8,7 +8,7 @@
             @foreach (var item in Model)
             {
                 <text>
-                    @Html.ActionLink(item.Name, "Details", new { id = item.Url }, new { @class = "btn btn-success" })&nbsp;
+                    @Html.ActionLink(item.Name, "Details", new { id = item.Slug }, new { @class = "btn btn-success" })&nbsp;
                 </text>
             }
 

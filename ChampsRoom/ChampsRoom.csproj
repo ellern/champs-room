@@ -228,13 +228,25 @@
     <Compile Include="Migrations\201311160958249_PlayerToUserRefactor.Designer.cs">
       <DependentUpon>201311160958249_PlayerToUserRefactor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201311171054023_RenameUrlToSlug.cs" />
+    <Compile Include="Migrations\201311171054023_RenameUrlToSlug.Designer.cs">
+      <DependentUpon>201311171054023_RenameUrlToSlug.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\Models.cs" />
-    <Compile Include="Models\ViewModels.cs" />
+    <Compile Include="Models\League.cs" />
+    <Compile Include="Models\Match.cs" />
+    <Compile Include="Models\Rating.cs" />
+    <Compile Include="Models\Set.cs" />
+    <Compile Include="Models\Team.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\LeagueDetailsViewModel.cs" />
+    <Compile Include="ViewModels\ResultDetailsViewModel.cs" />
+    <Compile Include="ViewModels\TeamsIndexViewModel.cs" />
+    <Compile Include="ViewModels\RatingsViewModel.cs" />
+    <Compile Include="ViewModels\ResultCreateViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="content\bootstrap-theme.css" />
@@ -372,6 +384,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201311160958249_PlayerToUserRefactor.resx">
       <DependentUpon>201311160958249_PlayerToUserRefactor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311171054023_RenameUrlToSlug.resx">
+      <DependentUpon>201311171054023_RenameUrlToSlug.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
