@@ -201,7 +201,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\EloRating.cs" />
-    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\Extensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Helpers\Helpers.cs" />
     <Compile Include="Helpers\Statistics.cs" />
     <Compile Include="Migrations\201311151506104_InitialCreate.cs" />
