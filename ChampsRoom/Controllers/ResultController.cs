@@ -33,7 +33,9 @@ namespace ChampsRoom.Controllers
             if (user == null)
                 return HttpNotFound();
 
-            var league = await db.Leagues.FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
+            var league = await db.Leagues
+                .Include(i => i.Users)
+                .FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
 
             var viewmodel = new ResultDetailsViewModel()
             {
@@ -41,6 +43,20 @@ namespace ChampsRoom.Controllers
                 Matches = user.Matches.Where(q => q.LeagueId == league.Id).OrderByDescending(q => q.Created).ToList(),
                 User = user
             };
+
+            var maxRank = league.Users.Count + 1;
+            var chartRanking = "";
+            var chartRating = "";
+            var counter = 1;
+
+            foreach (var item in viewmodel.Matches.Take(50).Reverse())
+            {
+                chartRanking += String.Format("[{0},{1}],", counter, System.Math.Abs(item.GetRating(viewmodel.User).Rank - maxRank));
+                chartRating += String.Format("[{0},{1}],", counter++, item.GetRating(viewmodel.User).Rate);
+            }
+
+            ViewBag.ChartRanking = chartRanking.Trim(',');
+            ViewBag.ChartRating = chartRating.Trim(',');
 
             return View(viewmodel);
         }
@@ -81,6 +97,12 @@ namespace ChampsRoom.Controllers
             #region Find Users and Teams
 
             var userId = User.Identity.GetUserId();
+
+            if (home == null)
+                home = new List<string>();
+
+            if (away == null)
+                return View();
 
             home.Add(userId);
 

@@ -88,14 +88,14 @@
                     <p class="lead">
                         @foreach (var user in item.HomeUsers)
                         {
-                            <img src="@user.GetImageUrl()" alt="" class="img-rounded img-profile img-profile-md" />
+                            <a href="@Url.Action("Details", "Result", new { slug = Model.League.Slug, slugUser = user.Slug })"><img src="@user.GetImageUrl()" alt="" class="img-rounded img-profile img-profile-md" /></a>
                         }
 
                         <span class="label label-default">@item.GetHomeSetScore()</span> <span class="text-muted">-</span> <span class="label label-default">@item.GetAwaySetScore()</span>
 
                         @foreach (var user in item.AwayUsers)
                         {
-                            <img src="@user.GetImageUrl()" alt="" class="img-rounded img-profile img-profile-md" />
+                            <a href="@Url.Action("Details", "Result", new { slug = Model.League.Slug, slugUser = user.Slug })"><img src="@user.GetImageUrl()" alt="" class="img-rounded img-profile img-profile-md" /></a>
                         }
                     </p>
                 </div>
