@@ -94,7 +94,7 @@ namespace ChampsRoom.Controllers
             if (league == null)
                 return HttpNotFound();
 
-            #region Find Users and Teams
+            #region Users and Teams
 
             var userId = User.Identity.GetUserId();
 
@@ -106,14 +106,9 @@ namespace ChampsRoom.Controllers
 
             home.Add(userId);
 
-            var homeUsers = db.Users.Include(i => i.Teams).Where(q => home.Contains(q.Id));
-            var awayUsers = db.Users.Include(i => i.Teams).Where(q => away.Contains(q.Id));
             var allTeams = db.Teams.Include(i => i.Users);
-            var homeTeam = allTeams.FirstOrDefault(p => !p.Users.Select(u => u.Id).Except(home).Union(home.Except(p.Users.Select(u => u.Id))).Any());
-            var awayTeam = allTeams.FirstOrDefault(p => !p.Users.Select(u => u.Id).Except(away).Union(away.Except(p.Users.Select(u => u.Id))).Any());
-
-            //var homeTeam = allTeams.Where(p => !p.Users.Select(c => c.Id).Except(home).Union(home.Except(p.Users.Select(c => c.Id))).Any()).FirstOrDefault();
-            //var awayTeam = allTeams.Where(p => !p.Users.Select(c => c.Id).Except(away).Union(away.Except(p.Users.Select(c => c.Id))).Any()).FirstOrDefault();
+            var homeTeam = await allTeams.FirstOrDefaultAsync(p => !p.Users.Select(u => u.Id).Except(home).Union(home.Except(p.Users.Select(u => u.Id))).Any());
+            var awayTeam = await allTeams.FirstOrDefaultAsync(p => !p.Users.Select(u => u.Id).Except(away).Union(away.Except(p.Users.Select(u => u.Id))).Any());
 
             if (homeTeam == null)
             {
@@ -163,44 +158,27 @@ namespace ChampsRoom.Controllers
                 if (homeScore[i].HasValue && awayScore[i].HasValue)
                     sets.Add(new Set() { HomeScore = homeScore[i].Value, AwayScore = awayScore[i].Value });
 
-            var homeWins = sets.Count(q => q.HomeScore > q.AwayScore);
-            var awayWins = sets.Count(q => q.HomeScore < q.AwayScore);
-
             #endregion
 
             #region Ratings
 
-            var ratingHome = new List<Tuple<string, int, int, int, int>>();
-            var ratingAway = new List<Tuple<string, int, int, int, int>>();
-
-            foreach (var item in homeTeam.Users)
-            {
-                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == league.Id && q.User.Id == item.Id);
-                var rating = latestRating == null ? 1000 : latestRating.Rate;
-                var rank = latestRating == null ? league.Users.Count : latestRating.Rank;
-                ratingHome.Add(new Tuple<string, int, int, int, int>(item.Id, rating, rank, 0, 0));
-            }
-
-            foreach (var item in awayTeam.Users)
-            {
-                var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == league.Id && q.User.Id == item.Id);
-                var rating = latestRating == null ? 1000 : latestRating.Rate;
-                var rank = latestRating == null ? league.Users.Count : latestRating.Rank;
-                ratingAway.Add(new Tuple<string, int, int, int, int>(item.Id, rating, rank, 0, 0));
-            }
-
-            var avgHome = ratingHome.Sum(q => q.Item2) / homeTeam.Users.Count;
-            var avgAway = ratingAway.Sum(q => q.Item2) / awayTeam.Users.Count;
+            var homeWins = sets.Count(q => q.HomeScore > q.AwayScore);
+            var awayWins = sets.Count(q => q.HomeScore < q.AwayScore);
             var homeWon = homeWins > awayWins;
             var awayWon = awayWins > homeWins;
             var draw = homeWins == awayWins;
-            var elorating = EloRating.CalculateChange(avgHome, avgAway, homeWins, awayWins);
+            var elorating = EloRating.CalculateChange(league.Id, home, away, homeWins, awayWins);
+            var rankingHome = new Dictionary<string, int>();
+            var rankingAway = new Dictionary<string, int>();            
             var ratings = new List<Rating>();
 
             foreach (var item in homeTeam.Users)
             {
                 var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == league.Id && q.User.Id == item.Id);
                 var ratingChange = homeWon ? System.Math.Abs(elorating) : System.Math.Abs(elorating) * -1;
+                var rating = latestRating == null ? 1000 : latestRating.Rate;
+                var rank = latestRating == null ? league.Users.Count : latestRating.Rank;
+                rankingHome.Add(item.Id, rank);
 
                 ratings.Add(new Rating()
                 {
@@ -223,6 +201,9 @@ namespace ChampsRoom.Controllers
             {
                 var latestRating = db.Ratings.OrderByDescending(q => q.Created).FirstOrDefault(q => q.League.Id == league.Id && q.User.Id == item.Id);
                 var ratingChange = awayWon ? System.Math.Abs(elorating) : System.Math.Abs(elorating) * -1;
+                var rating = latestRating == null ? 1000 : latestRating.Rate;
+                var rank = latestRating == null ? league.Users.Count : latestRating.Rank;
+                rankingAway.Add(item.Id, rank);
 
                 ratings.Add(new Rating()
                 {
@@ -243,6 +224,8 @@ namespace ChampsRoom.Controllers
 
             #endregion
 
+            #region Match
+
             var match = new Match()
             {
                 AwayUsers = awayTeam.Users,
@@ -261,6 +244,8 @@ namespace ChampsRoom.Controllers
 
             await db.SaveChangesAsync();
 
+            #endregion
+
             #region Update ranking post match
 
             foreach (var item in homeTeam.Users)
@@ -268,7 +253,7 @@ namespace ChampsRoom.Controllers
                 var rank = Statistics.GetRank(league.Id, item.Id);
                 var rating = ratings.FirstOrDefault(q => q.UserId == item.Id);
                 rating.Rank = rank;
-                rating.RankingChange = ratingHome.FirstOrDefault(q => q.Item1 == item.Id).Item3 - rank;
+                rating.RankingChange = rankingHome[item.Id] - rank;
 
                 db.Entry(rating).State = EntityState.Modified;
             }
@@ -278,7 +263,7 @@ namespace ChampsRoom.Controllers
                 var rank = Statistics.GetRank(league.Id, item.Id);
                 var rating = ratings.FirstOrDefault(q => q.UserId == item.Id);
                 rating.Rank = rank;
-                rating.RankingChange = ratingAway.FirstOrDefault(q => q.Item1 == item.Id).Item3 - rank;
+                rating.RankingChange = rankingAway[item.Id] - rank;
 
                 db.Entry(rating).State = EntityState.Modified;
             }
@@ -288,6 +273,27 @@ namespace ChampsRoom.Controllers
             await db.SaveChangesAsync();
 
             return RedirectToAction("Details", "League", new { slug = league.Slug });
+        }
+
+        [Authorize]
+        [Route("~/leagues/{slug}/result/calc")]
+        public async Task<ActionResult> Calc(string slug, List<string> home, List<string> away)
+        {
+            if (away == null || away.Count == 0)
+                return HttpNotFound();
+
+            if (home == null)
+                home = new List<string>();
+
+            home.Add(User.Identity.GetUserId());
+
+            var league = await db.Leagues.FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
+            var eloHome = EloRating.CalculateChange(league.Id, home, away, 1, 0).DisplayChange();
+            var eloAway = EloRating.CalculateChange(league.Id, home, away, 0, 1).DisplayChange();
+
+            var elo = String.Format("{0} / {1}", eloHome, eloAway);
+
+            return Content(elo, "text/html");
         }
     }
 }

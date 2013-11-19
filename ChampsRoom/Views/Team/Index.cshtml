@@ -9,7 +9,14 @@
     <div class="col-xs-12 col-md-12 text-center">
         @foreach (var item in Model.Teams)
         {
-            <a href="@Url.Action("Details", "Team", new { slug = item.Slug })" class="btn btn-default">@item.Name</a>
+            <a href="@Url.Action("Details", "Team", new { slug = item.Slug })" class="btn btn-team">
+                @foreach (var user in item.Users)
+                {
+                    <img src="@user.GetImageUrl()" alt="" class="img-rounded img-profile img-profile-md" />
+                }
+                <br />
+                @item.Name
+            </a>
         }
     </div>
 </div>

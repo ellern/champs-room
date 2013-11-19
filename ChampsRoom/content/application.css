@@ -6,6 +6,10 @@
     margin-top: 25px;
 }
 
+.btn-team {
+    border: 1px solid #eee;
+}
+
 .img-profile {
     border: 2px solid #eee;
     transition: all 0.2s ease-in-out;
@@ -23,7 +27,7 @@
         width: 52px;
     }
 
-    .img-profile.img-profile-large {
+    .img-profile.img-profile-lg {
         width: 80px;
     }
 

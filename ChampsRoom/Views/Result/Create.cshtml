@@ -1,98 +1,115 @@
 ﻿@model ChampsRoom.ViewModels.ResultCreateViewModel
 @using Microsoft.AspNet.Identity
 
-    <div class="row text-center">
-        <h1>@Model.League.Name</h1>
-        <p class="lead">Register result</p>
+<div class="row text-center">
+    <h1>@Model.League.Name</h1>
+    <p class="lead">Register result</p>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.Hidden("SetsNeededToWin", Model.League.SetsNeededToWin)
+    @Html.Hidden("MaxScore", Model.League.MaxScore)
+    @Html.Hidden("MinScore", Model.League.MinScore)
+    @Html.Hidden("LeagueId", Model.League.Id)
+
+    @*<div class="row text-center">
+        <h3>Players</h3>
+    </div>*@
+
+    <div class="row">
+        <div class="col-xs-6 col-md-4 col-md-offset-2">
+            <p class="text-center">Home:</p>
+            <div class="well well-sm" style="height: 150px; overflow-y: auto;">
+                @foreach (var item in Model.Users)
+                {
+                    <label class="checkbox"><input class="checkbox-home" id="checkbox-home-@item.Id" type="checkbox" name="home" value="@item.Id" data-name="@item.UserName" checked="@(item.Id == User.Identity.GetUserId())" disabled="@(item.Id == User.Identity.GetUserId())" /> @item.UserName</label>
+                }
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <p class="text-center">Away:</p>
+            <div class="well well-sm" style="height: 150px; overflow-y: auto;">
+                @foreach (var item in Model.Users)
+                {
+                    <label class="checkbox"><input class="checkbox-away" id="checkbox-away-@item.Id" type="checkbox" name="away" value="@item.Id" data-name="@item.UserName" disabled="@(item.Id == User.Identity.GetUserId())" /> @item.UserName</label>
+                }
+            </div>
+        </div>
     </div>
 
-    @using (Html.BeginForm())
+    <div class="row text-center">
+        <h3>Result</h3>
+        <p class="lead"><span class="rating-calc"></span></p>
+    </div>
+
+    for (int i = 1; i <= Model.League.Sets; i++)
     {
-        @Html.Hidden("SetsNeededToWin", Model.League.SetsNeededToWin)
-        @Html.Hidden("MaxScore", Model.League.MaxScore)
-        @Html.Hidden("MinScore", Model.League.MinScore)
-        @Html.Hidden("LeagueId", Model.League.Id)
-
-        <div class="row text-center">
-            <h3>Players</h3>
-        </div>
-
-        <div class="row">
-            <div class="col-xs-6 col-md-4 col-md-offset-2">
-                <p class="text-center">Home:</p>
-                <div class="well well-sm" style="height: 150px; overflow-y: auto;">
-                    @foreach (var item in Model.Users)
-                    {
-                        <label class="checkbox"><input class="checkbox-home" id="checkbox-home-@item.Id" type="checkbox" name="home" value="@item.Id" data-name="@item.UserName" checked="@(item.Id == User.Identity.GetUserId())" disabled="@(item.Id == User.Identity.GetUserId())" /> @item.UserName</label>
-                    }
-                </div>
+        <div class="row" style="margin-top: 5px;">
+            <div class="col-xs-6 col-md-2 col-md-offset-4">
+                <input type="number" max="@Model.League.MaxScore" min="@Model.League.MinScore" class="form-control input-lg text-center @(i <= Model.League.SetsNeededToWin ? " required number" : "" ) result result-home result-home-@i" data-ref="result-away-@i" placeholder="#@i" alt="Result set @i" name="homescore" />
             </div>
-            <div class="col-xs-6 col-md-4">
-                <p class="text-center">Away:</p>
-                <div class="well well-sm" style="height: 150px; overflow-y: auto;">
-                    @foreach (var item in Model.Users)
-                    {
-                        <label class="checkbox"><input class="checkbox-away" id="checkbox-away-@item.Id" type="checkbox" name="away" value="@item.Id" data-name="@item.UserName" disabled="@(item.Id == User.Identity.GetUserId())" /> @item.UserName</label>
-                    }
-                </div>
+            <div class="col-xs-6 col-md-2">
+                <input type="number" max="@Model.League.MaxScore" min="@Model.League.MinScore" class="form-control input-lg text-center @(i <= Model.League.SetsNeededToWin ? " required number" : "" ) result result-away result-away-@i" data-ref="result-home-@i" placeholder="#@i" alt="Result set @i" name="awayscore" />
             </div>
         </div>
+    }
 
-        <div class="row text-center">
-            <h3>Result</h3>
+    <div class="row" style="margin-top: 25px;">
+        <div class="col-xs-12 col-md-12 text-center">
+            <p class="text-center hidden-xs">
+                <button type="submit" class="btn btn-success btn-lg btn-submit">Save result</button>
+            </p>
+            <p class="text-center visible-xs">
+                <button type="submit" class="btn btn-success btn-lg btn-block btn-submit">Save result</button>
+            </p>
+            <p><a href="@Url.Action("Details", "League", new { slug = Model.League.Slug })">Cancel</a></p>
         </div>
+    </div>
 
-        for (int i = 1; i <= Model.League.Sets; i++)
-        {
-            <div class="row" style="margin-top: 5px;">
-                <div class="col-xs-6 col-md-2 col-md-offset-4">
-                    <input type="number" max="@Model.League.MaxScore" min="@Model.League.MinScore" class="form-control input-lg text-center @(i <= Model.League.SetsNeededToWin ? " required number" : "" ) result result-home result-home-@i" data-ref="result-away-@i" placeholder="#@i" alt="Result set @i" name="homescore" />
-                </div>
-                <div class="col-xs-6 col-md-2">
-                    <input type="number" max="@Model.League.MaxScore" min="@Model.League.MinScore" class="form-control input-lg text-center @(i <= Model.League.SetsNeededToWin ? " required number" : "" ) result result-away result-away-@i" data-ref="result-home-@i" placeholder="#@i" alt="Result set @i" name="awayscore" />
-                </div>
-            </div>
+    <div class="row text-center result-winner" style="margin-top: 30px;">
+        <p class="lead">
+            <span class="player-home"></span>
+            <span class="text-winloose"></span>
+            <span class="player-away"></span>
+        </p>
+    </div>
+}
+
+@section scripts {
+    <script type="text/javascript">
+
+        function getRating() {
+            var form = $("form");
+            var e = $(".rating-calc");
+
+            $.ajax({ url: "@Url.Action("Calc", new { slug = Model.League.Slug })", type: "GET", cache: false, data: form.serialize() })
+                    .success(function (data) {
+                        e.html(data + "<br /><small class='text-muted'>for winner!</small>").fadeIn();
+                    })
+            .error(function (){
+                e.fadeOut();
+            });
         }
 
-        <div class="row" style="margin-top: 25px;">
-            <div class="col-xs-12 col-md-12 text-center">
-                <p class="text-center hidden-xs">
-                    <button type="submit" class="btn btn-success btn-lg btn-submit">Save result</button>
-                </p>
-                <p class="text-center visible-xs">
-                    <button type="submit" class="btn btn-success btn-lg btn-block btn-submit">Save result</button>
-                </p>
-                <p><a href="@Url.Action("Details", "League", new { slug = Model.League.Slug })">Cancel</a></p>
-            </div>
-        </div>
-
-        <div class="row text-center result-winner" style="margin-top: 30px;">
-            <p class="lead">
-                <span class="player-home"></span>
-                <span class="text-winloose"></span>
-                <span class="player-away"></span>
-            </p>
-        </div>
-    }
-
-    @section scripts {
-        <script type="text/javascript">
-            $(document).on('change', '.checkbox-home', function (event) {
-                var checked = $(this).prop("checked");
-                $("#checkbox-away-" + $(this).val()).prop("disabled", checked).prop("checked", false).fadeToggle(!checked);
-                findWinner();
-            });
-
-            $(document).on('change', '.checkbox-away', function (event) {
-                var checked = $(this).prop("checked");
-                $("#checkbox-home-" + $(this).val()).prop("disabled", checked).prop("checked", false).fadeToggle(!checked);
-                findWinner();
-            });
-
-            $(document).on('propertychange keyup input paste', '.result', function (event) {
-                findWinner();
-            });
-
+        $(document).on('change', '.checkbox-home', function (event) {
+            var checked = $(this).prop("checked");
+            $("#checkbox-away-" + $(this).val()).prop("disabled", checked).prop("checked", false).fadeToggle(!checked);
             findWinner();
-        </script>
-    }
+            getRating();
+        });
+
+        $(document).on('change', '.checkbox-away', function (event) {
+            var checked = $(this).prop("checked");
+            $("#checkbox-home-" + $(this).val()).prop("disabled", checked).prop("checked", false).fadeToggle(!checked);
+            findWinner();
+            getRating();
+        });
+
+        $(document).on('propertychange keyup input paste', '.result', function (event) {
+            findWinner();
+        });
+
+        findWinner();
+    </script>
+}
