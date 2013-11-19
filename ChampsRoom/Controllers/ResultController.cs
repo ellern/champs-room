@@ -108,20 +108,7 @@ namespace ChampsRoom.Controllers
 
             var homeUsers = db.Users.Include(i => i.Teams).Where(q => home.Contains(q.Id));
             var awayUsers = db.Users.Include(i => i.Teams).Where(q => away.Contains(q.Id));
-
-            var userFound = false;
-
-            foreach (var item in homeUsers.Where(item => !userFound))
-                userFound = item.Id == userId;
-
-            foreach (var item in awayUsers.Where(item => !userFound))
-                userFound = item.Id == userId;
-
-            if (!userFound)
-                return HttpNotFound();
-
             var allTeams = db.Teams.Include(i => i.Users);
-
             var homeTeam = allTeams.FirstOrDefault(p => !p.Users.Select(u => u.Id).Except(home).Union(home.Except(p.Users.Select(u => u.Id))).Any());
             var awayTeam = allTeams.FirstOrDefault(p => !p.Users.Select(u => u.Id).Except(away).Union(away.Except(p.Users.Select(u => u.Id))).Any());
 
