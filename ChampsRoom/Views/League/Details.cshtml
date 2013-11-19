@@ -84,7 +84,7 @@
         {
             <div class="row text-center">
 
-                <div class="col-xs-12 col-md-12">
+                <div class="col-xs-12 col-md-12" rel="tooltip" data-toggle="tooltip" data-html="true" title="@item.GetSetScoresTooltip().ToHtmlString()">
                     <p class="lead">
                         @foreach (var user in item.HomeUsers)
                         {
