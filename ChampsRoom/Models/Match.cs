@@ -49,8 +49,8 @@ namespace ChampsRoom.Models
             var result = "Scores: <br />";
             var count = 1;
 
-            foreach (var item in this.Sets)
-                result += String.Format("{0} - {1}<br />", item.HomeScore, item.AwayScore, count++);
+            foreach (var item in this.Sets.OrderBy(q => q.Id))
+                result += String.Format("<em>#{2}</em>: {0} - {1}<br />", item.HomeScore, item.AwayScore, count++);
 
             return new HtmlString(result.Substring(0, result.Length - 6));
         }
@@ -68,13 +68,24 @@ namespace ChampsRoom.Models
             return result;
         }
 
-        public IQueryable<User> Opponent(User user)
+        public IQueryable<User> Opponents(User user)
         {
             if (this.HomeUsers.Contains(user))
                 return this.AwayUsers.AsQueryable();
 
             if (this.AwayUsers.Contains(user))
                 return this.HomeUsers.AsQueryable();
+
+            return new List<User>().AsQueryable();
+        }
+
+        public IQueryable<User> Teammates(User user)
+        {
+            if (this.HomeUsers.Contains(user))
+                return this.HomeUsers.AsQueryable();
+
+            if (this.AwayUsers.Contains(user))
+                return this.AwayUsers.AsQueryable();
 
             return new List<User>().AsQueryable();
         }

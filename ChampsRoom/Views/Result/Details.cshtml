@@ -20,7 +20,8 @@
             <thead>
                 <tr>
                     <th>Date</th>
-                    <th>Opponents</th>
+                    <th>Home</th>
+                    <th>Away</th>
                     <th>Score</th>
                     <th>Rating</th>
                     <th>Rank</th>
@@ -33,9 +34,17 @@
                     <td>@item.Created.ToShortDateString() @item.Created.ToShortTimeString()</td>
                     <td>
                         <ul class="list-inline">
-                            @foreach (var opponent in item.Opponent(Model.User))
+                            @foreach (var user in item.HomeUsers)
                             {
-                                <li><a href="@Url.Action("Details", new { slug = Model.League.Slug, slugUser = opponent.Slug })">@opponent.UserName</a></li>
+                                <li><a href="@Url.Action("Details", "Result", new { slug = Model.League.Slug, slugUser = user.Slug })"><img src="@user.GetImageUrl()" class="img-rounded img-profile img-profile-xs" alt="" /></a></li>
+                            }                            
+                        </ul>
+                    </td>
+                    <td>
+                        <ul class="list-inline">
+                            @foreach (var user in item.AwayUsers)
+                            {
+                                <li><a href="@Url.Action("Details", "Result", new { slug = Model.League.Slug, slugUser = user.Slug })"><img src="@user.GetImageUrl()" class="img-rounded img-profile img-profile-xs" alt="" /></a></li>
                             }
                         </ul>
                     </td>
