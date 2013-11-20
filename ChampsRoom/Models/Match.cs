@@ -49,7 +49,7 @@ namespace ChampsRoom.Models
             var result = "Scores: <br />";
             var count = 1;
 
-            foreach (var item in this.Sets.OrderBy(q => q.Id))
+            foreach (var item in this.Sets.OrderByDescending(q => q.Id))
                 result += String.Format("<em>#{2}</em>: {0} - {1}<br />", item.HomeScore, item.AwayScore, count++);
 
             return new HtmlString(result.Substring(0, result.Length - 6));
