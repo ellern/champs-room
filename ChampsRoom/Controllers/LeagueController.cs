@@ -46,7 +46,9 @@ namespace ChampsRoom.Controllers
                 .Include(i => i.HomeUsers)
                 .Include(i => i.AwayTeam)
                 .Include(i => i.HomeTeam)
-                .OrderByDescending(q => q.Created).ToListAsync();
+                .OrderByDescending(q => q.Created)
+                .Where(q => q.LeagueId == league.Id)
+                .ToListAsync();
 
             var ratingViewModels = new List<RatingsViewModel>();
 
