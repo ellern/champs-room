@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using ChampsRoom.ViewModels;
+using Microsoft.AspNet.Identity;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 
@@ -81,6 +84,21 @@ namespace ChampsRoom.Helpers
                 .Trim('-');
 
             return s;
+        }
+    }
+
+    public static class MiscExtensions
+    {
+        public static List<RatingsViewModel> OrderByRanking(this List<RatingsViewModel> ratingViewModels)
+        {
+            return ratingViewModels
+                    .OrderByDescending(q => q.Rate)
+                    .ThenByDescending(q => q.Score)
+                    .ThenByDescending(q => q.Won)
+                    .ThenByDescending(q => q.Draw)
+                    .ThenBy(q => q.Matches)
+                    .ThenBy(q => q.User.UserName)
+                    .ToList();
         }
     }
 }

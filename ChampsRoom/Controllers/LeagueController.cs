@@ -77,13 +77,7 @@ namespace ChampsRoom.Controllers
             {
                 LatestMatches = latestMatches,
                 League = league,
-                Ratings = ratingViewModels
-                    .OrderByDescending(q => q.Rate)
-                    .ThenByDescending(q => q.Won)
-                    .ThenByDescending(q => q.Draw)
-                    .ThenBy(q => q.Matches)
-                    .ThenBy(q => q.User.UserName)
-                    .ToList()
+                Ratings = ratingViewModels.OrderByRanking()
             };
 
             var rank = 0;

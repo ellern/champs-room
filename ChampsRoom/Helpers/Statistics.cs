@@ -45,19 +45,14 @@ namespace ChampsRoom.Helpers
                     Rank = latestRating == null ? 0 : latestRating.Rank,
                     Rate = latestRating == null ? 1000 : latestRating.Rate,
                     RatingChange = latestRating == null ? 0 : latestRating.RatingChange,
+                    Score = userRatings.Sum(q => q.Score),
                     Team = null
                 };
 
                 rankings.Add(ranking);
             }
 
-            rankings = rankings
-                .OrderByDescending(q => q.Rate)
-                .ThenByDescending(q => q.Won)
-                .ThenByDescending(q => q.Draw)
-                .ThenBy(q => q.Matches)
-                .ThenBy(q => q.User.UserName)
-                .ToList();
+            rankings = rankings.OrderByRanking();
 
             var rank = 1;
 
