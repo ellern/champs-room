@@ -34,20 +34,21 @@ namespace ChampsRoom.Controllers
             if (league == null)
                 return HttpNotFound();
 
-            var ratings = await db.Ratings                
+            var ratings = await db.Ratings
+                .Include(i => i.User)
                 .Where(q => q.LeagueId == league.Id)
                 .OrderByDescending(q => q.Created)
                 .ToListAsync();
 
             var latestMatches = await db.Matches
-                .Take(20)
                 .Include(i => i.Sets)
                 .Include(i => i.AwayUsers)
                 .Include(i => i.HomeUsers)
                 .Include(i => i.AwayTeam)
                 .Include(i => i.HomeTeam)
-                .OrderByDescending(q => q.Created)
                 .Where(q => q.LeagueId == league.Id)
+                .OrderByDescending(q => q.Created)
+                .Take(20)
                 .ToListAsync();
 
             var ratingViewModels = new List<RatingsViewModel>();
@@ -69,7 +70,7 @@ namespace ChampsRoom.Controllers
                     RatingChange = userLatestRating == null ? 0 : userLatestRating.RatingChange,
                     Score = userRatings.Sum(q => q.Score),
                     Team = null,
-                    User = user                    
+                    User = user
                 };
 
                 ratingViewModels.Add(ratingsViewModel);
