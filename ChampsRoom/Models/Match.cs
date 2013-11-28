@@ -118,5 +118,21 @@ namespace ChampsRoom.Models
 
             return false;
         }
+
+        public bool IsHome(User user)
+        {
+            if (this.HomeUsers.Contains(user))
+                return true;
+
+            return false;
+        }
+
+        public bool IsAway(User user)
+        {
+            if (this.AwayUsers.Contains(user))
+                return true;
+
+            return false;
+        }
     }
 }
