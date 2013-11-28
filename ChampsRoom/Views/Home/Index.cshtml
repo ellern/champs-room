@@ -1,5 +1,4 @@
-﻿<div class="row row-top-spacer">
-</div>
+﻿@model IEnumerable<ChampsRoom.Models.League>
 
 <div class="row row-top-spacer text-center">
     <div class="col-xs-12 col-md-12">
@@ -10,5 +9,8 @@
 <div class="row row-top-spacer text-center">
     <p class="lead">Who's the Champ of the office?</p>
 
-    <a href="@Url.Action("Index", "League")" class="btn btn-success btn-lg">Find out now</a>
+    @foreach (var item in Model)
+    {
+        <a href="@Url.Action("Details", "League", new { slug = item.Slug })" class="btn btn-success btn-lg">@item.Name</a>
+    }
 </div>
