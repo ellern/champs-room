@@ -51,12 +51,17 @@ namespace ChampsRoom.Controllers
 
             foreach (var item in viewmodel.Matches.Take(50).Reverse())
             {
-                chartRanking += String.Format("[{0},{1}],", counter, System.Math.Abs(item.GetRating(viewmodel.User).Rank - maxRank));
-                chartRating += String.Format("[{0},{1}],", counter++, item.GetRating(viewmodel.User).Rate);
+                var rank = System.Math.Abs(item.GetRating(viewmodel.User).Rank - maxRank);
+                var rating = item.GetRating(viewmodel.User).Rate;
+
+                chartRanking += String.Format("[{0},{1}],", counter, rank);
+                chartRating += String.Format("[{0},{1}],", counter++, rating);
             }
 
             ViewBag.ChartRanking = chartRanking.Trim(',');
             ViewBag.ChartRating = chartRating.Trim(',');
+            ViewBag.ChartRatingMax = user.Ratings.Max(q => q.Rate) + 100;
+            ViewBag.ChartRatingMin = Math.Round(user.Ratings.Min(q => q.Rate) / 2m, MidpointRounding.AwayFromZero);
 
             return View(viewmodel);
         }

@@ -11,8 +11,6 @@
 }
 ﻿
 $(document).ready(function () {
-    console.log("document ready");
-
     $("[rel='tooltip']").tooltip({ html: true });
 });
 
@@ -39,7 +37,7 @@ function findWinner() {
 
     $(".checkbox-home:checked").each(function () {
         var name = $(this).data("name");
-        homeTeam = homeTeam + name + ",";
+        homeTeam = homeTeam + name + ", ";
         homeCount++;
     });
     homeTeam = homeTeam.substring(0, homeTeam.length - 2)

@@ -104,65 +104,66 @@
 @section scripts {
     <script language="javascript" type="text/javascript" src="~/Scripts/flot/jquery.flot.min.js"></script>
     <script type="text/javascript">
-        $(function () {
+    $(function () {
 
-            $('.tooltip').tooltip();
+        $('.tooltip').tooltip();
 
-            var chartRanking = [@ViewBag.ChartRanking];
-            //var chartRanking = [[1,1],[2,1],[3,1],[4,1],[5,2],[6,2],[7,5]];
+        var chartRanking = [@ViewBag.ChartRanking];
+        var chartRankMax = @Model.League.Users.Count;
+        var chartRating = [@ViewBag.ChartRating];
+        var chartRatingMax = @ViewBag.ChartRatingMax;
+        var chartRatingMin = @ViewBag.ChartRatingMin;
 
-            var chartRating = [@ViewBag.ChartRating];
-
-            var optionsRating = {
-                series: {
-                    color: '#4bcd4b',
-                    lines: { fill: true },
-                    points: { show: false }
+        var optionsRating = {
+            series: {
+                color: '#4bcd4b',
+                lines: { fill: true },
+                points: { show: false }
+            },
+            yaxis: {
+                label: "Rating",
+                max: chartRatingMax,
+                min: chartRatingMin
                 },
-                yaxis: {
-                    label: "Rating",
-                    max: 1550,
-                    min: 500
-                },
-                grid: {
-                    borderColor: '#d8d8d8',
-                    backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
+            grid: {
+                borderColor: '#d8d8d8',
+                backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
+            }
+        };
+
+        var optionsRanking = {
+            series: {
+                color: '#4bcd4b',
+                lines: { fill: true },
+                points: { show: false }
+            },
+            yaxis: {
+                label: "Rank",
+                max: chartRankMax,
+                min: 1,
+                tickFormatter: function (val, axis)
+                {
+                    if (val == axis.max)
+                        return "Champ!";
+
+                    if (val <= 1)
+                        return "Lorten!";
+
+                    return Math.abs(val-(chartRankMax + 1));
                 }
-            };
-
-            var optionsRanking = {
-                series: {
-                    color: '#4bcd4b',
-                    lines: { fill: true },
-                    points: { show: false }
-                },
-                yaxis: {
-                    label: "Rank",
-                    max: @(Model.League.Users.Count),
-                    min: 1,
-                    tickFormatter: function (val, axis)
-                    {
-                        if (val == axis.max)
-                            return "Champ!";
-
-                        if (val <= 1)
-                            return "Lorten!";
-
-                        return Math.abs(val-@(Model.League.Users.Count + 1));
-                    }
-                },
-                grid: {
-                    borderColor: '#d8d8d8',
-                    backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
-                }
-            };
+            },
+            grid: {
+                borderColor: '#d8d8d8',
+                backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
+            }
+        };
 
 
-            $.plot($("#chart-ranking"), [chartRanking], optionsRanking);
-            $.plot($("#chart-rating"), [chartRating], optionsRating);
+        $.plot($("#chart-ranking"), [chartRanking], optionsRanking);
+        $.plot($("#chart-rating"), [chartRating], optionsRating);
 
 
-            $("<div class='axisLabel yaxisLabel'></div>").text("Pressure").appendTo($("#yl_1"));
-        });
+        $("<div class='axisLabel yaxisLabel'></div>").text("Pressure").appendTo($("#yl_1"));
+    });
     </script>
 }
