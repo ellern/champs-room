@@ -16,7 +16,15 @@ namespace ChampsRoom.Helpers
 
             var calc = 120 * (1 / (1 + Math.Pow(10, (r1-r2) / 400)));
 
-            return Convert.ToInt32(Math.Round(calc, MidpointRounding.AwayFromZero));
+            var result = Convert.ToInt32(Math.Round(calc, MidpointRounding.AwayFromZero));
+
+            if (result == 0)
+                result = 1;
+
+            if (result == 120)
+                result = 119;
+
+            return result;
         }
 
         public static int CalculateChange(Guid leagueId, ICollection<string> home, ICollection<string> away, int scoreHome = 1, int scoreAway = 0)
@@ -41,6 +49,12 @@ namespace ChampsRoom.Helpers
 
             var avgHome = ratingHome / home.Count;
             var avgAway = ratingAway / away.Count;
+
+            if (home.Count == 1 && away.Count > 1)
+                avgHome = Convert.ToInt32(ratingHome * 0.70);
+
+            if (away.Count == 1 && home.Count > 1)
+                avgAway = Convert.ToInt32(ratingAway * 0.70);
 
             return EloRating.CalculateChange(avgHome, avgAway, scoreHome, scoreAway);
         }
