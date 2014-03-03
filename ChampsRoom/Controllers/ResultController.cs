@@ -227,6 +227,8 @@ namespace ChampsRoom.Controllers
                 });
             }
 
+            // TODO: Give all points from loosing team to winning player - when player 1 vs. 2
+
             #endregion
 
             #region Match
@@ -293,10 +295,18 @@ namespace ChampsRoom.Controllers
             home.Add(User.Identity.GetUserId());
 
             var league = await db.Leagues.FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
-            var eloHome = EloRating.CalculateChange(league.Id, home, away, 1, 0).DisplayChange();
-            var eloAway = EloRating.CalculateChange(league.Id, home, away, 0, 1).DisplayChange();
+            var eloHome = EloRating.CalculateChange(league.Id, home, away, 1, 0);
+            var eloAway = EloRating.CalculateChange(league.Id, home, away, 0, 1);            
+            var eloHomeChange = eloHome.DisplayChange();
+            var eloAwayChange = eloAway.DisplayChange();
 
-            var elo = String.Format("{0} / {1}", eloHome, eloAway);
+            // TODO: Give all points from loosing team to winning player - when player 1 vs. 2
+            //if (home.Count == 1 && away.Count > 1)
+            //    eloHome = eloAway * away.Count;
+            //if (away.Count == 1 && home.Count > 1)
+            //    eloAway = eloHome * home.Count;
+
+            var elo = String.Format("{0} / {1}", eloHomeChange, eloAwayChange);
 
             return Content(elo, "text/html");
         }
