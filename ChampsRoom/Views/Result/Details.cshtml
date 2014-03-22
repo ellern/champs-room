@@ -4,33 +4,36 @@
     <h1>@Model.User.UserName</h1>
     <p class="lead">All matches played in @Html.ActionLink(Model.League.Name, "Details", "League", new { slug = Model.League.Slug }, null)</p>
 
-    <p class="lead">
-        @foreach (var item in Model.Matches.SelectMany(q => q.Sets.Where(x => x.HomeScore == 0 || x.AwayScore == 0)))
-        {
-            if (item.Match.IsHome(Model.User))
+    @if (!Model.League.Name.Equals("Dart - Around the Clock", StringComparison.InvariantCultureIgnoreCase))
+    {
+        <p class="lead">
+            @foreach (var item in Model.Matches.SelectMany(q => q.Sets.Where(x => x.HomeScore == 0 || x.AwayScore == 0)))
             {
-                if (item.HomeScore == 0)
+                if (item.Match.IsHome(Model.User))
                 {
-                    <img src="~/content/images/egg-got.gif" />
+                    if (item.HomeScore == 0)
+                    {
+                        <img src="~/content/images/egg-got.gif" />
+                    }
+                    else if (item.AwayScore == 0)
+                    {
+                        <img src="~/content/images/egg-gave.gif" />
+                    }
                 }
-                else if (item.AwayScore == 0)
+                else
                 {
-                    <img src="~/content/images/egg-gave.gif" />
+                    if (item.AwayScore == 0)
+                    {
+                        <img src="~/content/images/egg-got.gif" />
+                    }
+                    else if (item.HomeScore == 0)
+                    {
+                        <img src="~/content/images/egg-gave.gif" />
+                    }
                 }
             }
-            else
-            {
-                if (item.AwayScore == 0)
-                {
-                    <img src="~/content/images/egg-got.gif" />
-                }
-                else if (item.HomeScore == 0)
-                {
-                    <img src="~/content/images/egg-gave.gif" />
-                }
-            }
-        }
-    </p>
+        </p>
+    }
 </div>
 
 <div class="row">
@@ -104,66 +107,66 @@
 @section scripts {
     <script language="javascript" type="text/javascript" src="~/Scripts/flot/jquery.flot.min.js"></script>
     <script type="text/javascript">
-    $(function () {
+        $(function () {
 
-        $('.tooltip').tooltip();
+            $('.tooltip').tooltip();
 
-        var chartRanking = [@ViewBag.ChartRanking];
-        var chartRankMax = @Model.League.Users.Count;
-        var chartRating = [@ViewBag.ChartRating];
-        var chartRatingMax = @ViewBag.ChartRatingMax;
-        var chartRatingMin = @ViewBag.ChartRatingMin;
+            var chartRanking = [@ViewBag.ChartRanking];
+            var chartRankMax = @Model.League.Users.Count;
+            var chartRating = [@ViewBag.ChartRating];
+            var chartRatingMax = @ViewBag.ChartRatingMax;
+            var chartRatingMin = @ViewBag.ChartRatingMin;
 
-        var optionsRating = {
-            series: {
-                color: '#4bcd4b',
-                lines: { fill: true },
-                points: { show: false }
-            },
-            yaxis: {
-                label: "Rating",
-                max: chartRatingMax,
-                min: chartRatingMin
+            var optionsRating = {
+                series: {
+                    color: '#4bcd4b',
+                    lines: { fill: true },
+                    points: { show: false }
                 },
-            grid: {
-                borderColor: '#d8d8d8',
-                backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
-            }
-        };
-
-        var optionsRanking = {
-            series: {
-                color: '#4bcd4b',
-                lines: { fill: true },
-                points: { show: false }
-            },
-            yaxis: {
-                label: "Rank",
-                max: chartRankMax,
-                min: 1,
-                tickFormatter: function (val, axis)
-                {
-                    if (val == axis.max)
-                        return "Champ!";
-
-                    if (val <= 1)
-                        return "Lorten!";
-
-                    return Math.abs(val-(chartRankMax + 1));
+                yaxis: {
+                    label: "Rating",
+                    max: chartRatingMax,
+                    min: chartRatingMin
+                },
+                grid: {
+                    borderColor: '#d8d8d8',
+                    backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
                 }
-            },
-            grid: {
-                borderColor: '#d8d8d8',
-                backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
-            }
-        };
+            };
+
+            var optionsRanking = {
+                series: {
+                    color: '#4bcd4b',
+                    lines: { fill: true },
+                    points: { show: false }
+                },
+                yaxis: {
+                    label: "Rank",
+                    max: chartRankMax,
+                    min: 1,
+                    tickFormatter: function (val, axis)
+                    {
+                        if (val == axis.max)
+                            return "Champ!";
+
+                        if (val <= 1)
+                            return "Lorten!";
+
+                        return Math.abs(val-(chartRankMax + 1));
+                    }
+                },
+                grid: {
+                    borderColor: '#d8d8d8',
+                    backgroundColor: { colors: ["#ffffff", "#d4d4d4"] }
+                }
+            };
 
 
-        $.plot($("#chart-ranking"), [chartRanking], optionsRanking);
-        $.plot($("#chart-rating"), [chartRating], optionsRating);
+            $.plot($("#chart-ranking"), [chartRanking], optionsRanking);
+            $.plot($("#chart-rating"), [chartRating], optionsRating);
 
 
-        $("<div class='axisLabel yaxisLabel'></div>").text("Pressure").appendTo($("#yl_1"));
-    });
+            $("<div class='axisLabel yaxisLabel'></div>").text("Pressure").appendTo($("#yl_1"));
+        });
     </script>
 }

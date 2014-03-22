@@ -36,7 +36,7 @@ namespace ChampsRoom.Controllers
 
             var ratings = await db.Ratings
                 .Include(i => i.User)
-                .Where(q => q.LeagueId == league.Id)
+                .Where(q => q.LeagueId == league.Id && q.User.Leagues.Any(c => c.Id == league.Id))
                 .OrderByDescending(q => q.Created)
                 .ToListAsync();
 
