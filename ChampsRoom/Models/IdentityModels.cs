@@ -40,7 +40,7 @@ namespace ChampsRoom.Models
     public class DataContext : IdentityDbContext<User>
     {
         public DataContext()
-            : base("DefaultConnection")
+            : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
 
