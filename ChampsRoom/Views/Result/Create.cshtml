@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-xs-6 col-md-4 col-md-offset-2">
             <p class="text-center">Home:</p>
-            <div class="well well-sm" style="height: 200px; overflow-y: auto;">
+            <div class="well well-sm well-home" style="height: 200px; overflow-y: auto;">
                 @foreach (var item in Model.Users)
                 {
                     <label class="checkbox"><input class="checkbox-home" id="checkbox-home-@item.Id" type="checkbox" name="home" value="@item.Id" data-name="@item.UserName" checked="@(item.Id == User.Identity.GetUserId())" disabled="@(item.Id == User.Identity.GetUserId())" /><img src="@item.GetImageUrl()" alt="" class="img-rounded img-profile img-profile-xs" style="max-width: 23px;" /> @item.UserName</label>
@@ -25,7 +25,7 @@
         </div>
         <div class="col-xs-6 col-md-4">
             <p class="text-center">Away:</p>
-            <div class="well well-sm" style="height: 200px; overflow-y: auto;">
+            <div class="well well-sm well-away" style="height: 200px; overflow-y: auto;">
                 @foreach (var item in Model.Users)
                 {
                     <label class="checkbox"><input class="checkbox-away" id="checkbox-away-@item.Id" type="checkbox" name="away" value="@item.Id" data-name="@item.UserName" disabled="@(item.Id == User.Identity.GetUserId())" /><img src="@item.GetImageUrl()" alt="" class="img-rounded img-profile img-profile-xs" style="max-width: 23px;" /> @item.UserName</label>
@@ -87,6 +87,9 @@
                 e.fadeOut();
             });
         }
+
+        $('.well-home > label:gt(@(Model.UsersInLeague-1))').css("opacity", "0.35");
+        $('.well-away > label:gt(@(Model.UsersInLeague-1))').css("opacity", "0.35");
 
         $(document).on('change', '.checkbox-home', function (event) {
             var checked = $(this).prop("checked");

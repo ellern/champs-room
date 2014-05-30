@@ -70,17 +70,33 @@ namespace ChampsRoom.Controllers
         [Route("~/leagues/{slug}/result")]
         public async Task<ActionResult> Create(string slug)
         {
-            var leagues = await db.Leagues.Include(q => q.Users).FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
+            var league = await db.Leagues.Include(q => q.Users).FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
 
-            if (leagues == null)
+            if (league == null)
                 return HttpNotFound();
+
+            var ratings = await db.Ratings
+                .Include(i => i.User)
+                .Where(q => q.LeagueId == league.Id && q.User.Leagues.Any(c => c.Id == league.Id))
+                .OrderByDescending(q => q.Created)
+                .ToListAsync();
+
+            var usersWithRatings = ratings.Select(q => q.User).Distinct().OrderBy(q => q.UserName).ToList();
+            var users = await db.Users.OrderBy(q => q.UserName).ToListAsync();
+            var usersInLeague = usersWithRatings.Count;
+
+            foreach (var user in users)
+            {
+                if (usersWithRatings.Count(q => q.Id == user.Id) == 0)
+                    usersWithRatings.Add(user);
+            }
 
             var viewmodel = new ResultCreateViewModel()
             {
                 Match = new Match(),
-                League = leagues,
-                Users = db.Users.OrderBy(q => q.UserName).ToList()
-
+                League = league,
+                Users = usersWithRatings,
+                UsersInLeague = usersInLeague
             };
 
             return View(viewmodel);
@@ -174,7 +190,7 @@ namespace ChampsRoom.Controllers
             var draw = homeWins == awayWins;
             var elorating = EloRating.CalculateChange(league.Id, home, away, homeWins, awayWins);
             var rankingHome = new Dictionary<string, int>();
-            var rankingAway = new Dictionary<string, int>();            
+            var rankingAway = new Dictionary<string, int>();
             var ratings = new List<Rating>();
 
             foreach (var item in homeTeam.Users)
@@ -296,7 +312,7 @@ namespace ChampsRoom.Controllers
 
             var league = await db.Leagues.FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
             var eloHome = EloRating.CalculateChange(league.Id, home, away, 1, 0);
-            var eloAway = EloRating.CalculateChange(league.Id, home, away, 0, 1);            
+            var eloAway = EloRating.CalculateChange(league.Id, home, away, 0, 1);
             var eloHomeChange = eloHome.DisplayChange();
             var eloAwayChange = eloAway.DisplayChange();
 
