@@ -28,6 +28,15 @@ namespace ChampsRoom.Controllers
         public AccountController(UserManager<User> userManager)
         {
             UserManager = userManager;
+
+            UserManager.PasswordValidator = new PasswordValidator
+            {
+                RequireDigit = false,
+                RequiredLength = 2,
+                RequireNonLetterOrDigit = false,
+                RequireLowercase = false,
+                RequireUppercase = false,
+            };
         }
 
         public UserManager<User> UserManager { get; private set; }
