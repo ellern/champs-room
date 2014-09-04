@@ -99,17 +99,15 @@ namespace ChampsRoom.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(League league)
         {
-            if (ModelState.IsValid)
-            {
-                league.Slug = league.Name.ToFriendlyUrl();
+            if (!ModelState.IsValid)
+                return View(league);
 
-                db.Leagues.Add(league);
-                await db.SaveChangesAsync();
+            league.Slug = league.Name.ToFriendlyUrl();
 
-                return RedirectToAction("Index");
-            }
+            db.Leagues.Add(league);
+            await db.SaveChangesAsync();
 
-            return View(league);
+            return RedirectToAction("Index");
         }
 
         public async Task<ActionResult> Edit(Guid id)
@@ -125,17 +123,15 @@ namespace ChampsRoom.Controllers
         [HttpPost]
         public async Task<ActionResult> Edit(League league)
         {
-            if (ModelState.IsValid)
-            {
-                league.Slug = league.Name.ToFriendlyUrl();
+            if (!ModelState.IsValid)
+                return View(league);
 
-                db.Entry(league).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+            league.Slug = league.Name.ToFriendlyUrl();
 
-                return RedirectToAction("Index");
-            }
+            db.Entry(league).State = EntityState.Modified;
+            await db.SaveChangesAsync();
 
-            return View(league);
+            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)

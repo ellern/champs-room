@@ -11,11 +11,13 @@ using System.Web.Mvc;
 
 namespace ChampsRoom.Controllers
 {
+    [Authorize]
     [RoutePrefix("results")]
     public class ResultController : Controller
     {
         private DataContext db = new DataContext();
-
+        
+        [AllowAnonymous]
         [Route("~/leagues/{slug}/{slugUser}/results")]
         public async Task<ActionResult> Details(string slug, string slugUser)
         {
@@ -66,7 +68,6 @@ namespace ChampsRoom.Controllers
             return View(viewmodel);
         }
 
-        [Authorize]
         [Route("~/leagues/{slug}/result")]
         public async Task<ActionResult> Create(string slug)
         {
@@ -102,7 +103,6 @@ namespace ChampsRoom.Controllers
             return View(viewmodel);
         }
 
-        [Authorize]
         [HttpPost]
         [Route("~/leagues/{slug}/result")]
         public async Task<ActionResult> Create(string slug, List<string> home, List<string> away, List<int?> homeScore, List<int?> awayScore)
@@ -298,7 +298,6 @@ namespace ChampsRoom.Controllers
             return RedirectToAction("Details", "League", new { slug = league.Slug });
         }
 
-        [Authorize]
         [Route("~/leagues/{slug}/result/calc")]
         public async Task<ActionResult> Calc(string slug, List<string> home, List<string> away)
         {

@@ -1,15 +1,11 @@
-﻿using ChampsRoom.Helpers;
-using ChampsRoom.Models;
-using ChampsRoom.ViewModels;
-using System;
-using System.Collections.Generic;
+﻿using ChampsRoom.Models;
 using System.Data.Entity;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace ChampsRoom.Controllers
 {
+    [RoutePrefix("")]
     public class HomeController : Controller
     {
         private DataContext db = new DataContext();
