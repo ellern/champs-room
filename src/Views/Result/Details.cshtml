@@ -132,6 +132,15 @@
                     <td class="text-right">Goals avg. per match:</td>
                     <td class="text-left">@Model.Statistics.GoalsScoredPerMatch.ToString("+#;-#") / @((-Model.Statistics.GoalsConcededPerMatch).ToString("+#;-#"))</td>
                 </tr>
+
+                <tr>
+                    <td class="text-right">Best/worst rank:</td>
+                    <td class="text-left">@Model.Statistics.BestRank.ToString("#;-#") / @Model.Statistics.WorstRank.ToString("#;-#")</td>
+                </tr>
+                <tr>
+                    <td class="text-right">Best/worst rating:</td>
+                    <td class="text-left">@Model.Statistics.BestRating.ToString("#;-#") / @Model.Statistics.WorstRating.ToString("#;-#")</td>
+                </tr>
             </tbody>
         </table>
 

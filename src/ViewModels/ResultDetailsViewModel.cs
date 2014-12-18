@@ -19,6 +19,12 @@ namespace ChampsRoom.ViewModels
         public int Draw { get; set; }
         public double WinRatio { get; set; }
 
+        public int BestRank { get; set; }
+        public int BestRating { get; set; }
+        public int WorstRank { get; set; }
+        public bool WorstRankWasLast { get; set; }
+        public int WorstRating { get; set; }
+
         public int WinningStreak { get; set; }
         public int BestWinningStreak { get; set; }
         public int LoosingStreak { get; set; }

@@ -158,6 +158,36 @@ namespace ChampsRoom.Controllers
 
             #endregion
 
+            #region Best/worst rating
+
+            var bestRank = Int32.MaxValue;
+            var worstRank = 0;
+            var worstRankWasLast = false;
+            var bestRating = 0;
+            var worstRating = Int32.MaxValue;
+
+            foreach (var match in matches)
+            {
+                var rating = match.GetRating(user);
+
+                if (rating.Rate > bestRating)
+                    bestRating = rating.Rate;
+                
+                if (rating.Rate < worstRating)
+                    worstRating = rating.Rate;
+
+                if (rating.Rank < bestRank)
+                    bestRank = rating.Rank;
+
+                if (rating.Rank > worstRank)
+                {
+                    worstRank = rating.Rank;
+                    worstRankWasLast = rating.RankedLast;
+                }
+            }
+
+            #endregion
+
             var matchesCount = matches.Count;
             var matchesWon = matches.Count(x => x.UserWon(user));
             var matchesLost = matches.Count(x => x.UserLost(user));
@@ -187,6 +217,12 @@ namespace ChampsRoom.Controllers
                 GoalsConcededPerMatch = goalsConceded / matches.Count,
                 GoalsScored = goalsScored,
                 GoalsScoredPerMatch = goalsScored / matches.Count,
+
+                BestRank = bestRank,
+                WorstRank = worstRank,
+                WorstRankWasLast = worstRankWasLast,
+                BestRating = bestRating,
+                WorstRating = worstRating,
             };
 
             return result;
