@@ -158,11 +158,21 @@ namespace ChampsRoom.Controllers
 
             #endregion
 
+            var matchesCount = matches.Count;
+            var matchesWon = matches.Count(x => x.UserWon(user));
+            var matchesLost = matches.Count(x => x.UserLost(user));
+            var matchesDraw = matches.Count(x => x.Draw);
             var goalsConceded = matches.Sum(x => x.GetOpponentScore(user));
             var goalsScored = matches.Sum(x => x.GetScore(user));
 
             var result = new ResultStatisticsViewModel()
             {
+                Played = matches.Count,
+                Won = matchesWon,
+                Lost = matchesLost,
+                Draw = matchesDraw,
+                WinRatio = (matchesCount > 0 && matchesWon > 0) ? ((double)matchesWon / (double)matchesCount) * 100 : (double)0,
+
                 WinningStreak = winningStreak,
                 BestWinningStreak = bestWinningStreak,
                 LoosingStreak = loosingStreak,

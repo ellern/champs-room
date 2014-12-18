@@ -56,34 +56,24 @@
             </thead>
             <tbody>
                 <tr>
+                    <td class="col-xs-6 text-right">Matches played:</td>
+                    <td class="col-xs-6 text-left">@Model.Statistics.Played</td>
+                </tr>
+                <tr>
+                    <td class="col-xs-6 text-right">Won / Lost / Draw</td>
+                    <td class="col-xs-6 text-left">@Model.Statistics.Won / @Model.Statistics.Lost / @Model.Statistics.Draw</td>
+                </tr>
+                <tr>
+                    <td class="col-xs-6 text-right">Win ratio</td>
+                    <td class="col-xs-6 text-left">@Model.Statistics.WinRatio.ToString("0.##")%</td>
+                </tr>
+                <tr>
                     <td class="col-xs-6 text-right">Winning streak:</td>
-                    <td class="col-xs-6 text-left">
-                        @if (Model.Statistics.WinningStreak == 0)
-                        {
-                            <text>N/A</text>
-                        }
-                        else
-                        {
-                            <text>
-                                @Model.Statistics.WinningStreak (Best: @Model.Statistics.BestWinningStreak)
-                            </text>
-                        }
-                    </td>
+                    <td class="col-xs-6 text-left">@Model.Statistics.WinningStreak (Best: @Model.Statistics.BestWinningStreak)</td>
                 </tr>
                 <tr>
                     <td class="text-right">Loosing streak:</td>
-                    <td class="col-xs-6 text-left">
-                        @if (Model.Statistics.LoosingStreak == 0)
-                        {
-                            <text>N/A</text>
-                        }
-                        else
-                        {
-                            <text>
-                                @Model.Statistics.LoosingStreak (Worst: @Model.Statistics.WorstLoosingStreak)
-                            </text>
-                        }
-                    </td>
+                    <td class="col-xs-6 text-left">@Model.Statistics.LoosingStreak (Worst: @Model.Statistics.WorstLoosingStreak)</td>
                 </tr>
                 <tr>
                     <td class="text-right">Biggest win:</td>

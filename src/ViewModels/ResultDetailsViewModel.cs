@@ -13,6 +13,12 @@ namespace ChampsRoom.ViewModels
 
     public class ResultStatisticsViewModel
     {
+        public int Played { get; set; }
+        public int Won { get; set; }
+        public int Lost { get; set; }
+        public int Draw { get; set; }
+        public double WinRatio { get; set; }
+
         public int WinningStreak { get; set; }
         public int BestWinningStreak { get; set; }
         public int LoosingStreak { get; set; }
