@@ -29,8 +29,7 @@
 </div>
 
 <div class="row row-top-spacer">
-    <div class="col-xs-12 text-center">
-
+    <div class="col-xs-12">
         <table class="table table-striped table-responsive">
             <thead>
                 <tr>
@@ -72,7 +71,11 @@
                                 <div class="tooltip" rel="tooltip" data-toggle="tooltip" data-html="true" title="@Model.Statistics.BestWin.GetSetScoresTooltip().ToHtmlString()">Score</div>
                                 <span class="label label-success">@Model.Statistics.BestWin.GetHomeSetScore()</span>
                                 <span class="label label-success">@Model.Statistics.BestWin.GetAwaySetScore()</span>
-                                against @Model.Statistics.BestWin.GetOpponent(Model.User)
+                                <span>&nbsp;against</span>
+                                @foreach (var user in Model.Statistics.BestWin.Opponents(Model.User))
+                                {
+                                    <a href="@Url.Action("Details", "Result", new { slug = Model.League.Slug, slugUser = user.Slug })" style="margin-left: 5px;"><img src="@user.GetImageUrl()" class="img-rounded img-profile img-profile-xs" alt="" /></a>
+                                }
                             </text>
                         }
                     </td>
@@ -90,16 +93,18 @@
                                 <div class="tooltip" rel="tooltip" data-toggle="tooltip" data-html="true" title="@Model.Statistics.WorstLost.GetSetScoresTooltip().ToHtmlString()">Score</div>
                                 <span class="label label-danger">@Model.Statistics.WorstLost.GetHomeSetScore()</span>
                                 <span class="label label-danger">@Model.Statistics.WorstLost.GetAwaySetScore()</span>
-                                against @Model.Statistics.WorstLost.GetOpponent(Model.User)
+                                <span>&nbsp;against</span>
+                                @foreach (var user in Model.Statistics.WorstLost.Opponents(Model.User))
+                                {
+                                    <a href="@Url.Action("Details", "Result", new { slug = Model.League.Slug, slugUser = user.Slug })" style="margin-left: 5px;"><img src="@user.GetImageUrl()" class="img-rounded img-profile img-profile-xs" alt="" /></a>
+                                }
                             </text>
                         }
                     </td>
                 </tr>
                 <tr>
                     <td class="text-right">Eggs given / received:</td>
-                    <td class="text-left">
-                        @Model.Statistics.EggsGiven / @Model.Statistics.EggsConceded
-                    </td>
+                    <td class="text-left">@Model.Statistics.EggsGiven / @Model.Statistics.EggsConceded</td>
                 </tr>
                 <tr>
                     <td class="text-right">Goals scored / conceded:</td>
@@ -119,7 +124,6 @@
                 </tr>
             </tbody>
         </table>
-
     </div>
 </div>
 
