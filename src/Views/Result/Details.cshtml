@@ -7,30 +7,13 @@
     @if (!Model.League.Name.Equals("Dart - Around the Clock", StringComparison.InvariantCultureIgnoreCase))
     {
         <p class="lead">
-            @foreach (var item in Model.Matches.SelectMany(q => q.Sets.Where(x => x.HomeScore == 0 || x.AwayScore == 0)))
+            @for (int i = 0; i < Model.Statistics.EggsConceded; i++)
             {
-                if (item.Match.IsHome(Model.User))
-                {
-                    if (item.HomeScore == 0)
-                    {
-                        <img src="~/content/images/egg-got.gif" />
-                    }
-                    else if (item.AwayScore == 0)
-                    {
-                        <img src="~/content/images/egg-gave.gif" />
-                    }
-                }
-                else
-                {
-                    if (item.AwayScore == 0)
-                    {
-                        <img src="~/content/images/egg-got.gif" />
-                    }
-                    else if (item.HomeScore == 0)
-                    {
-                        <img src="~/content/images/egg-gave.gif" />
-                    }
-                }
+                <img src="~/content/images/egg-got.gif" />
+            }
+            @for (int i = 0; i < Model.Statistics.EggsGiven; i++)
+            {
+                <img src="~/content/images/egg-gave.gif" />
             }
         </p>
     }
@@ -98,7 +81,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="text-right">Worst lost:</td>
+                    <td class="text-right">Biggest defeat:</td>
                     <td class="text-left">
                         @if (Model.Statistics.WorstLost == null)
                         {
@@ -120,23 +103,25 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="text-right">Eggs given/conceded:</td>
-                    <td class="text-left">@Model.Statistics.EggsGiven / @Model.Statistics.EggsConceded</td>
+                    <td class="text-right">Eggs given / received:</td>
+                    <td class="text-left">
+                        @Model.Statistics.EggsGiven / @Model.Statistics.EggsConceded
+                    </td>
                 </tr>
                 <tr>
-                    <td class="text-right">Goals scored/conceded:</td>
+                    <td class="text-right">Goals scored / conceded:</td>
                     <td class="text-left">@Model.Statistics.GoalsScored / @Model.Statistics.GoalsConceded (@((Model.Statistics.GoalsScored - Model.Statistics.GoalsConceded).ToString("+#;-#")))</td>
                 </tr>
                 <tr>
-                    <td class="text-right">Goals avg. per match:</td>
+                    <td class="text-right">Avg. goals/match:</td>
                     <td class="text-left">@Model.Statistics.GoalsScoredPerMatch.ToString("+#;-#") / @((-Model.Statistics.GoalsConcededPerMatch).ToString("+#;-#"))</td>
                 </tr>
                 <tr>
-                    <td class="text-right">Best/worst rank:</td>
+                    <td class="text-right">Best / worst rank:</td>
                     <td class="text-left">@Model.Statistics.BestRank.ToString("#;-#") / @Model.Statistics.WorstRank.ToString("#;-#") @(Model.Statistics.WorstRankWasLast ? "<img src='/content/images/rank-last.gif' style='height: 16px; top: -1px; left: 3px; position: relative;' alt='' />" : "")</td>
                 </tr>
                 <tr>
-                    <td class="text-right">Best/worst rating:</td>
+                    <td class="text-right">Best / worst rating:</td>
                     <td class="text-left">@Model.Statistics.BestRating.ToString("#;-#") / @Model.Statistics.WorstRating.ToString("#;-#")</td>
                 </tr>
             </tbody>
