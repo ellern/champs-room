@@ -61,6 +61,7 @@
                 <tr>
                     <td class="text-right">Biggest win:</td>
                     <td class="text-left">
+                        <div class="tooltip" rel="tooltip" data-toggle="tooltip" data-html="true" title="@Model.Statistics.BestWin.GetSetScoresTooltip().ToHtmlString()">Score</div>
                         @if (Model.Statistics.BestWin == null)
                         {
                             <text>N/A</text>
@@ -68,14 +69,10 @@
                         else
                         {
                             <text>
-                                @Model.Statistics.BestWin.GetHomeSetScore() - @Model.Statistics.BestWin.GetAwaySetScore()
-
-                                @foreach (var set in Model.Statistics.BestWin.Sets)
-                                {
-                                    <span class="label label-success">@set.HomeScore - @set.AwayScore</span>
-                                }
-
-                                <span> against @Model.Statistics.BestWin.GetOpponent(Model.User)</span>
+                                <div class="tooltip" rel="tooltip" data-toggle="tooltip" data-html="true" title="@Model.Statistics.BestWin.GetSetScoresTooltip().ToHtmlString()">Score</div>
+                                <span class="label label-success">@Model.Statistics.BestWin.GetHomeSetScore()</span>
+                                <span class="label label-success">@Model.Statistics.BestWin.GetAwaySetScore()</span>
+                                against @Model.Statistics.BestWin.GetOpponent(Model.User)
                             </text>
                         }
                     </td>
@@ -90,14 +87,10 @@
                         else
                         {
                             <text>
-                                @Model.Statistics.WorstLost.GetHomeSetScore() - @Model.Statistics.WorstLost.GetAwaySetScore()
-
-                                @foreach (var set in Model.Statistics.WorstLost.Sets)
-                                {
-                                    <span class="label label-danger">@set.HomeScore - @set.AwayScore</span>
-                                }
-
-                                <span> against @Model.Statistics.WorstLost.GetOpponent(Model.User)</span>
+                                <div class="tooltip" rel="tooltip" data-toggle="tooltip" data-html="true" title="@Model.Statistics.WorstLost.GetSetScoresTooltip().ToHtmlString()">Score</div>
+                                <span class="label label-danger">@Model.Statistics.WorstLost.GetHomeSetScore()</span>
+                                <span class="label label-danger">@Model.Statistics.WorstLost.GetAwaySetScore()</span>
+                                against @Model.Statistics.WorstLost.GetOpponent(Model.User)
                             </text>
                         }
                     </td>
