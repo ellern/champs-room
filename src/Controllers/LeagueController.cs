@@ -91,11 +91,13 @@ namespace ChampsRoom.Controllers
             return View(viewmodel);
         }
 
+        [Authorize(Roles = "admin")]
         public ActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult> Create(League league)
         {
@@ -110,6 +112,7 @@ namespace ChampsRoom.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> Edit(Guid id)
         {
             var league = await db.Leagues.FindAsync(id);
@@ -120,6 +123,7 @@ namespace ChampsRoom.Controllers
             return View(league);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult> Edit(League league)
         {

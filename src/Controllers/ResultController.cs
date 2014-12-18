@@ -122,7 +122,7 @@ namespace ChampsRoom.Controllers
                     bestWinningStreak = winningStreak;
 
                 if (loosingStreak > worstLoosingStreak)
-                    loosingStreak = worstLoosingStreak;
+                    worstLoosingStreak = loosingStreak;
             }
 
             #endregion
@@ -137,7 +137,10 @@ namespace ChampsRoom.Controllers
                 if (bestWin == null)
                     bestWin = match;
 
-                if (match.GetScore(user) > bestWin.GetScore(user))
+                var score = match.GetScoreDiff();
+                var bestScore = bestWin.IsHome(user) ? bestWin.GetScoreDiff() : Math.Abs(bestWin.GetScoreDiff());
+
+                if (score > bestScore)
                     bestWin = match;
             }
 
@@ -146,7 +149,10 @@ namespace ChampsRoom.Controllers
                 if (worstLost == null)
                     worstLost = match;
 
-                if (match.GetScore(user) < worstLost.GetScore(user))
+                var score = match.GetScoreDiff();
+                var worstScore = worstLost.IsAway(user) ? worstLost.GetScoreDiff() : -worstLost.GetScoreDiff();
+
+                if (score < worstScore)
                     worstLost = match;
             }
 

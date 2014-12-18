@@ -61,6 +61,11 @@ namespace ChampsRoom.Models
             return 0;
         }
 
+        public int GetScoreDiff()
+        {
+            return this.GetHomeScore() - this.GetAwayScore();
+        }
+
         public int GetOpponentScore(User user)
         {
             if (this.HomeUsers == null)
