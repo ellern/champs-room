@@ -109,13 +109,13 @@ namespace ChampsRoom.Controllers
             {
                 if (match.UserWon(user))
                 {
-                    loosingStreak = 1;
+                    loosingStreak = 0;
                     winningStreak++;
                 }
                 else if (match.UserLost(user))
                 {
                     loosingStreak++;
-                    winningStreak = 1;
+                    winningStreak = 0;
                 }
 
                 if (winningStreak > bestWinningStreak)

@@ -56,7 +56,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="col-xs-6 text-right">Winning streak (Best):</td>
+                    <td class="col-xs-6 text-right">Winning streak:</td>
                     <td class="col-xs-6 text-left">
                         @if (Model.Statistics.WinningStreak == 0)
                         {
@@ -65,13 +65,13 @@
                         else
                         {
                             <text>
-                                @Model.Statistics.WinningStreak (@Model.Statistics.BestWinningStreak)
+                                @Model.Statistics.WinningStreak (Best: @Model.Statistics.BestWinningStreak)
                             </text>
                         }
                     </td>
                 </tr>
                 <tr>
-                    <td class="text-right">Loosing streak (Worst):</td>
+                    <td class="text-right">Loosing streak:</td>
                     <td class="col-xs-6 text-left">
                         @if (Model.Statistics.LoosingStreak == 0)
                         {
@@ -80,7 +80,7 @@
                         else
                         {
                             <text>
-                                @Model.Statistics.LoosingStreak (@Model.Statistics.WorstLoosingStreak)
+                                @Model.Statistics.LoosingStreak (Worst: @Model.Statistics.WorstLoosingStreak)
                             </text>
                         }
                     </td>
