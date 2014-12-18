@@ -4,14 +4,12 @@
     <div class="col-xs-12 col-md-12 text-center">
         <h1>Leagues</h1>
         <p class="lead">
-
             @foreach (var item in Model)
             {
                 <text>
                     @Html.ActionLink(item.Name, "Details", "League", new { slug = item.Slug }, new { @class = "btn btn-success" })&nbsp;
                 </text>
             }
-
         </p>
     </div>
 </div>

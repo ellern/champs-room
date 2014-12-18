@@ -34,6 +34,50 @@ namespace ChampsRoom.Models
         public ICollection<Rating> Ratings { get; set; }
         public ICollection<Set> Sets { get; set; }
 
+        public int GetHomeScore()
+        {
+            return this.Sets == null ? 0 : this.Sets.Sum(item => item.HomeScore);
+        }
+
+        public int GetAwayScore()
+        {
+            return this.Sets == null ? 0 : this.Sets.Sum(item => item.AwayScore);
+        }
+
+        public int GetScore(User user)
+        {
+            if (this.HomeUsers == null)
+                return 0;
+
+            if (this.HomeUsers.Contains(user))
+                return GetHomeScore();
+
+            if (this.AwayUsers == null)
+                return 0;
+
+            if (this.AwayUsers.Contains(user))
+                return GetAwayScore();
+
+            return 0;
+        }
+
+        public int GetOpponentScore(User user)
+        {
+            if (this.HomeUsers == null)
+                return 0;
+
+            if (this.HomeUsers.Contains(user))
+                return GetAwayScore();
+
+            if (this.AwayUsers == null)
+                return 0;
+
+            if (this.AwayUsers.Contains(user))
+                return GetHomeScore();
+
+            return 0;
+        }
+
         public int GetHomeSetScore()
         {
             return this.Sets == null ? 0 : this.Sets.Count(item => item.HomeScore > item.AwayScore);
@@ -114,6 +158,20 @@ namespace ChampsRoom.Models
                 return true;
 
             if (this.AwayUsers.Contains(user) && this.AwayWon)
+                return true;
+
+            return false;
+        }
+
+        public bool UserLost(User user)
+        {
+            if (this.Draw)
+                return false;
+
+            if (this.HomeUsers.Contains(user) && this.AwayWon)
+                return true;
+
+            if (this.AwayUsers.Contains(user) && this.HomeWon)
                 return true;
 
             return false;

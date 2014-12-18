@@ -46,7 +46,110 @@
 </div>
 
 <div class="row row-top-spacer">
-    <div class="col-xs-12 col-md-12">
+    <div class="col-xs-12 text-center">
+
+        <table class="table table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th class="text-center" colspan="2">Statistics</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-xs-6 text-right">Winning streak (Best):</td>
+                    <td class="col-xs-6 text-left">
+                        @if (Model.Statistics.WinningStreak == 0)
+                        {
+                            <text>N/A</text>
+                        }
+                        else
+                        {
+                            <text>
+                                @Model.Statistics.WinningStreak (@Model.Statistics.BestWinningStreak)
+                            </text>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-right">Loosing streak (Worst):</td>
+                    <td class="col-xs-6 text-left">
+                        @if (Model.Statistics.LoosingStreak == 0)
+                        {
+                            <text>N/A</text>
+                        }
+                        else
+                        {
+                            <text>
+                                @Model.Statistics.LoosingStreak (@Model.Statistics.WorstLoosingStreak)
+                            </text>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-right">Biggest win:</td>
+                    <td class="text-left">
+                        @if (Model.Statistics.BestWin == null)
+                        {
+                            <text>N/A</text>
+                        }
+                        else
+                        {
+                            <text>
+                                @Model.Statistics.BestWin.GetHomeSetScore() - @Model.Statistics.BestWin.GetAwaySetScore()
+
+                                @foreach (var set in Model.Statistics.BestWin.Sets)
+                                {
+                                    <span class="label label-success">@set.HomeScore - @set.AwayScore</span>
+                                }
+
+                                <span> against @Model.Statistics.BestWin.GetOpponent(Model.User)</span>
+                            </text>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-right">Worst lost:</td>
+                    <td class="text-left">
+                        @if (Model.Statistics.WorstLost == null)
+                        {
+                            <text>N/A</text>
+                        }
+                        else
+                        {
+                            <text>
+                                @Model.Statistics.WorstLost.GetHomeSetScore() - @Model.Statistics.WorstLost.GetAwaySetScore()
+
+                                @foreach (var set in Model.Statistics.WorstLost.Sets)
+                                {
+                                    <span class="label label-danger">@set.HomeScore - @set.AwayScore</span>
+                                }
+
+                                <span> against @Model.Statistics.WorstLost.GetOpponent(Model.User)</span>
+                            </text>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-right">Eggs given/conceded:</td>
+                    <td class="text-left">@Model.Statistics.EggsGiven / @Model.Statistics.EggsConceded</td>
+                </tr>
+                <tr>
+                    <td class="text-right">Goals scored/conceded:</td>
+                    <td class="text-left">@Model.Statistics.GoalsScored / @Model.Statistics.GoalsConceded (@((Model.Statistics.GoalsScored - Model.Statistics.GoalsConceded).ToString("+#;-#")))</td>
+                </tr>
+
+                <tr>
+                    <td class="text-right">Goals avg. per match:</td>
+                    <td class="text-left">@Model.Statistics.GoalsScoredPerMatch.ToString("+#;-#") / @((-Model.Statistics.GoalsConcededPerMatch).ToString("+#;-#"))</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<div class="row row-top-spacer">
+    <div class="col-xs-12">
         <table class="table table-striped table-hover table-responsive">
             <thead>
                 <tr>

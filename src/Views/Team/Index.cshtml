@@ -30,7 +30,11 @@
     <div class="col-xs-12 col-md-12 text-center">
         @foreach (var item in Model.Users)
         {
-            <a href="@Url.Action("Details", "User", new { slug = item.Slug })" class="btn btn-default">@item.UserName</a>
+            <a href="@Url.Action("Details", "User", new { slug = item.Slug })" class="btn btn-team">
+                <img src="@item.GetImageUrl()" alt="" class="img-rounded img-profile img-profile-md" />
+                <br />
+                @item.UserName
+            </a>
         }
     </div>
 </div>

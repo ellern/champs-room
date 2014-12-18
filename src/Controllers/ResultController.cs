@@ -16,7 +16,7 @@ namespace ChampsRoom.Controllers
     public class ResultController : Controller
     {
         private DataContext db = new DataContext();
-        
+
         [AllowAnonymous]
         [Route("~/leagues/{slug}/{slugUser}/results")]
         public async Task<ActionResult> Details(string slug, string slugUser)
@@ -39,10 +39,13 @@ namespace ChampsRoom.Controllers
                 .Include(i => i.Users)
                 .FirstOrDefaultAsync(q => q.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase));
 
+            var matches = user.Matches.Where(q => q.LeagueId == league.Id).OrderByDescending(q => q.Created).ToList();
+
             var viewmodel = new ResultDetailsViewModel()
             {
                 League = league,
-                Matches = user.Matches.Where(q => q.LeagueId == league.Id).OrderByDescending(q => q.Created).ToList(),
+                Matches = matches,
+                Statistics = buildStatistics(user, matches),
                 User = user
             };
 
@@ -66,6 +69,111 @@ namespace ChampsRoom.Controllers
             ViewBag.ChartRatingMin = Math.Round(user.Ratings.Min(q => q.Rate) / 2m, MidpointRounding.AwayFromZero);
 
             return View(viewmodel);
+        }
+
+        private ResultStatisticsViewModel buildStatistics(User user, IList<Match> matches)
+        {
+            #region Eggs
+
+            var eggsGiven = 0;
+            var eggsConceded = 0;
+
+            foreach (var match in matches.SelectMany(q => q.Sets.Where(x => x.HomeScore == 0 || x.AwayScore == 0)).ToList())
+            {
+                if (match.Match.IsHome(user))
+                {
+                    if (match.HomeScore == 0)
+                        eggsConceded++;
+                    else if (match.AwayScore == 0)
+                        eggsGiven++;
+                }
+                else
+                {
+                    if (match.AwayScore == 0)
+                        eggsConceded++;
+                    else if (match.HomeScore == 0)
+                        eggsGiven++;
+                }
+            }
+
+            #endregion
+
+            #region Best/worst streaks
+
+            var winningStreak = 0;
+            var bestWinningStreak = 0;
+            var loosingStreak = 0;
+            var worstLoosingStreak = 0;
+
+            foreach (var match in matches.OrderBy(x => x.Created))
+            {
+                if (match.UserWon(user))
+                {
+                    loosingStreak = 1;
+                    winningStreak++;
+                }
+                else if (match.UserLost(user))
+                {
+                    loosingStreak++;
+                    winningStreak = 1;
+                }
+
+                if (winningStreak > bestWinningStreak)
+                    bestWinningStreak = winningStreak;
+
+                if (loosingStreak > worstLoosingStreak)
+                    loosingStreak = worstLoosingStreak;
+            }
+
+            #endregion
+
+            #region Best/worst matches
+
+            var bestWin = (Match)null;
+            var worstLost = (Match)null;
+
+            foreach (var match in matches.Where(x => x.UserWon(user)).ToList())
+            {
+                if (bestWin == null)
+                    bestWin = match;
+
+                if (match.GetScore(user) > bestWin.GetScore(user))
+                    bestWin = match;
+            }
+
+            foreach (var match in matches.Where(x => x.UserLost(user)).ToList())
+            {
+                if (worstLost == null)
+                    worstLost = match;
+
+                if (match.GetScore(user) < worstLost.GetScore(user))
+                    worstLost = match;
+            }
+
+            #endregion
+
+            var goalsConceded = matches.Sum(x => x.GetOpponentScore(user));
+            var goalsScored = matches.Sum(x => x.GetScore(user));
+
+            var result = new ResultStatisticsViewModel()
+            {
+                WinningStreak = winningStreak,
+                BestWinningStreak = bestWinningStreak,
+                LoosingStreak = loosingStreak,
+                WorstLoosingStreak = worstLoosingStreak,
+
+                BestWin = bestWin,
+                WorstLost = worstLost,
+
+                EggsConceded = eggsConceded,
+                EggsGiven = eggsGiven,
+                GoalsConceded = goalsConceded,
+                GoalsConcededPerMatch = goalsConceded / matches.Count,
+                GoalsScored = goalsScored,
+                GoalsScoredPerMatch = goalsScored / matches.Count,
+            };
+
+            return result;
         }
 
         [Route("~/leagues/{slug}/result")]
