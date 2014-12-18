@@ -154,5 +154,8 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
-/ChampsRoom/App_Data/*.mdf
-/ChampsRoom/App_Data/*.ldf
+/src/App_Data/*.mdf
+/src/App_Data/*.ldf
+
+# Publish profiles
+/src/Properties/PublishProfiles/
