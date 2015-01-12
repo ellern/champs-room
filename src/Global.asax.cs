@@ -13,8 +13,6 @@ namespace ChampsRoom
     {
         protected void Application_Start()
         {
-            THIS WON*T BUILD
-            
             ViewEngines.Engines.Clear();
             ViewEngines.Engines.Add(new RazorViewEngine());
 
