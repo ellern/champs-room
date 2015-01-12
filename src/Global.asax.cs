@@ -13,6 +13,8 @@ namespace ChampsRoom
     {
         protected void Application_Start()
         {
+            throw new Exception("Testing CI");
+            
             ViewEngines.Engines.Clear();
             ViewEngines.Engines.Add(new RazorViewEngine());
 
